@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWEP Essay Marker — CEFR Assessment &amp; Upgrade Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<style>
+:root{
+  --ink:#211c14;--ink-soft:#5c5343;--ink-faint:#8a8068;
+  --paper:#f6f0e4;--card:#fffdf7;--line:#e9e0cc;--line-strong:#d8cbac;
+  --accent:#9a3412;--accent-soft:#c2613a;--accent-wash:#fbeee6;
+  --good:#3f6212;--good-wash:#f0f4e6;--warn:#b45309;--danger:#b91c1c;--danger-wash:#fdeceb;
+  --gold:#b08d3e;--gold-soft:#c9a85c;--gold-wash:#f7efdd;
+  --shadow:0 1px 2px rgba(70,55,20,.05),0 10px 36px rgba(70,55,20,.10);
+}
+*{box-sizing:border-box;}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);line-height:1.6;margin:0;padding:28px 16px 64px;min-height:100vh;background:var(--paper);
+  background-image:url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 0L44 22L22 44L0 22Z' fill='none' stroke='%23e3d8bf' stroke-width='1'/%3E%3C/svg%3E");}
+.container{max-width:1180px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.container::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-soft),var(--gold),var(--gold-soft));z-index:5;}
+h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(1.6rem,4.5vw,2.4rem);line-height:1.08;margin:0;}
+h2{font-family:"Fraunces",serif;font-weight:600;font-size:1.55rem;margin:0 0 10px;}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:1.18rem;margin:0 0 6px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px clamp(20px,4vw,40px) 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.brand-sub{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:3px;}
+.lede{font-size:.95rem;color:var(--ink-soft);margin:4px 0 0;max-width:62ch;}
+
+/* nav tabs */
+.tabs{display:flex;gap:6px;padding:14px clamp(20px,4vw,40px) 0;border-bottom:1px solid var(--line);flex-wrap:wrap;background:#fffcf4;}
+.tab{font-family:"Inter",sans-serif;font-size:.88rem;font-weight:600;color:var(--ink-soft);background:transparent;border:1px solid transparent;border-bottom:none;border-radius:10px 10px 0 0;padding:10px 16px;cursor:pointer;transition:.15s;position:relative;top:1px;}
+.tab:hover:not(:disabled){color:var(--accent);background:var(--accent-wash);}
+.tab.active{color:var(--accent);background:var(--card);border-color:var(--line);font-weight:700;}
+.tab:disabled{color:#c5bba4;cursor:not-allowed;}
+.tab .tcount{display:inline-block;min-width:20px;font-size:.7rem;background:var(--gold-wash);color:var(--gold);border:1px solid var(--gold-soft);border-radius:9px;padding:0 6px;margin-left:6px;}
+main{padding:clamp(22px,4vw,40px);}
+.screen{display:none;}
+.screen.active{display:block;animation:fade .3s ease both;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* panes & form */
+.pane{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin:0 0 22px;box-shadow:0 2px 8px rgba(0,0,0,.03);}
+.pane.overall-pane{border:2px solid var(--gold-soft);background:var(--card);}
+.pane-title{font-size:1.08rem;font-weight:600;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.pane-title .badge{background:var(--accent);color:#fff;padding:4px 12px;border-radius:8px;font-size:.98rem;letter-spacing:.04em;}
+.pane.overall-pane .pane-title .badge{background:var(--gold);font-size:1.25rem;padding:6px 16px;}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--ink-soft);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em;}
+input[type=text],input[type=number],textarea{width:100%;font-family:"Inter",sans-serif;font-size:1rem;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;transition:border-color .18s;}
+textarea{font-family:"Newsreader",Georgia,serif;font-size:1.08rem;line-height:1.7;resize:vertical;}
+input:focus,textarea:focus{outline:none;border-color:var(--gold);}
+.frow{display:grid;grid-template-columns:1fr 180px 180px;gap:14px;}
+@media(max-width:760px){.frow{grid-template-columns:1fr;}}
+.field{margin-bottom:16px;}
+#prompt-text{min-height:110px;}
+#essay-text{min-height:260px;}
+.wc-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:10px 2px 0;font-size:.88rem;color:var(--ink-faint);flex-wrap:wrap;}
+.wc-count b{color:var(--accent);}
+.file-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;}
+button.ghost{font-family:"Inter",sans-serif;background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-soft);font-size:.88rem;font-weight:600;padding:10px 16px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;}
+button.ghost:hover:not(:disabled){border-color:var(--accent-soft);color:var(--accent);background:var(--accent-wash);}
+button.ghost:disabled{opacity:.5;cursor:not-allowed;}
+.file-chip{font-size:.84rem;color:var(--ink-soft);background:var(--gold-wash);border:1px solid var(--gold-soft);border-radius:16px;padding:5px 13px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+button.main{font-family:"Inter",sans-serif;background:var(--accent);color:#fff;border:none;padding:16px 28px;font-size:1.02rem;border-radius:11px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:8px;transition:background .2s,transform .08s;}
+button.main:hover:not(:disabled){background:var(--accent-soft);}
+button.main:disabled{background:var(--line-strong);cursor:not-allowed;}
+.err-box{display:none;background:var(--danger-wash);border:1px solid #f3c9c6;color:var(--danger);border-radius:10px;padding:12px 16px;font-size:.92rem;margin:14px 0 0;}
+.err-box.show{display:block;}
+
+/* loading overlay */
+.overlay{position:fixed;inset:0;background:rgba(40,30,15,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60;}
+.overlay.hidden{display:none;}
+.tile{background:var(--card);border-radius:18px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(40,30,15,.3);max-width:430px;width:100%;padding:38px 30px;text-align:center;}
+.spinner{width:42px;height:42px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;margin:0 auto 20px;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.tile p{color:var(--ink-soft);margin:0;}
+.tile .stage{font-family:"Fraunces",serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;}
+
+/* report */
+.bar-wrap{background:var(--paper);border:1px solid var(--line);border-radius:8px;height:14px;overflow:hidden;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--gold));border-radius:8px 0 0 8px;transition:width .8s ease;}
+.bar-labels{display:flex;justify-content:space-between;font-size:.68rem;color:var(--ink-faint);margin-top:4px;}
+.scale{display:flex;justify-content:space-between;margin-top:6px;}
+.scale .step{font-size:.78rem;color:var(--ink-faint);font-weight:600;padding:2px 7px;border-radius:7px;}
+.scale .step.on{color:#fff;background:var(--gold);}
+.feedback-text{font-size:.96rem;color:var(--ink-soft);margin:0 0 12px;line-height:1.55;background:var(--paper);padding:12px 14px;border-radius:8px;border:1px solid var(--line);}
+.dim-row{display:grid;grid-template-columns:230px 1fr;gap:16px;padding:16px 0;border-bottom:1px dashed var(--line);align-items:start;}
+.dim-row:last-child{border-bottom:none;}
+@media(max-width:700px){.dim-row{grid-template-columns:1fr;gap:8px;}}
+.dim-name{font-weight:600;}
+.dim-name .dband{display:inline-block;font-size:.8rem;color:#fff;background:var(--ink-soft);border-radius:7px;padding:2px 9px;margin-left:8px;}
+.dim-sub{font-size:.78rem;color:var(--ink-faint);font-weight:400;display:block;margin-top:2px;}
+.dim-ev{font-size:.86rem;color:var(--ink-soft);margin-top:7px;font-style:italic;}
+ul.blist{margin:0;padding-left:20px;}
+ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
+.etable{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:6px;}
+.etable th{background:var(--paper);text-align:left;padding:10px 12px;border:1px solid var(--line);color:var(--ink-soft);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;}
+.etable td{padding:12px;border:1px solid var(--line);vertical-align:top;}
+.etable tr:nth-child(even){background:#faf8f5;}
+.etable .vex{font-family:"Newsreader",Georgia,serif;font-size:.98rem;}
+.plan-step{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed var(--line);}
+.plan-step:last-child{border-bottom:none;}
+.plan-num{font-family:"Fraunces",serif;font-weight:600;color:#fff;background:var(--gold);min-width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:.88rem;flex:none;margin-top:2px;}
+.report-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.save-note{font-size:.85rem;color:var(--good);background:var(--good-wash);border:1px solid #d8e4bf;border-radius:9px;padding:8px 14px;display:inline-block;}
+.save-note.warn{color:var(--warn);background:#fdf6ec;border-color:#f0d9b5;}
+.tool-note{display:none;font-size:.9rem;border-radius:10px;padding:11px 16px;margin:0 0 16px;}
+.tool-note.ok{display:block;color:var(--good);background:var(--good-wash);border:1px solid #d8e4bf;}
+.tool-note.err{display:block;color:var(--danger);background:var(--danger-wash);border:1px solid #f3c9c6;}
+.tool-note a{color:var(--accent);font-weight:600;}
+
+/* lesson studio */
+.studio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.mat-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px;}
+.mat-card .mat-ico{font-size:1.8rem;}
+.mat-card p{font-size:.86rem;color:var(--ink-soft);margin:0;flex:1;}
+.mat-card .tool-note{margin:0;}
+.plan-stage{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:14px 0;border-bottom:1px dashed var(--line);}
+.plan-stage:last-child{border-bottom:none;}
+@media(max-width:640px){.plan-stage{grid-template-columns:1fr;gap:6px;}}
+.plan-min{font-family:"Fraunces",serif;font-weight:600;color:var(--gold);font-size:1.1rem;}
+.plan-min .pf{display:block;font-family:"Inter",sans-serif;font-size:.7rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:2px;}
+.plan-stage h4{margin:0 0 4px;font-size:1rem;}
+.plan-stage .pdesc{font-size:.92rem;color:var(--ink-soft);}
+.plan-stage .pmeta{font-size:.8rem;color:var(--ink-faint);margin-top:6px;}
+.plan-stage .ptip{font-size:.84rem;color:var(--good);background:var(--good-wash);border:1px solid #d8e4bf;border-radius:8px;padding:7px 11px;margin-top:8px;display:inline-block;}
+.rp-scenario{background:var(--gold-wash);border:1.5px solid var(--gold-soft);border-radius:12px;padding:16px 18px;font-size:.92rem;color:var(--ink-soft);margin-bottom:14px;}
+.rp-scenario b{color:var(--ink);}
+.rp-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.rp-chip{font-size:.8rem;font-weight:600;color:var(--ink-soft);background:#fff;border:1.5px solid var(--line-strong);border-radius:16px;padding:4px 12px;transition:.25s;}
+.rp-chip.used{color:#fff;background:var(--gold);border-color:var(--gold);transform:scale(1.05);}
+.rp-chat{display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;padding:14px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;}
+.rp-msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:.95rem;line-height:1.5;}
+.rp-msg.them{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:4px;}
+.rp-msg.me{align-self:flex-end;background:var(--accent-wash);border:1px solid #f0d3c4;border-bottom-right-radius:4px;}
+.rp-msg .who{display:block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:3px;}
+.rp-coach{font-size:.86rem;color:var(--warn);background:#fdf6ec;border:1px solid #f0d9b5;border-radius:10px;padding:9px 13px;margin-bottom:10px;}
+.rp-inputrow{display:flex;gap:10px;align-items:flex-end;}
+.rp-inputrow textarea{flex:1;min-height:54px;font-family:"Inter",sans-serif;font-size:.95rem;}
+.rp-typing{font-style:italic;color:var(--ink-faint);}
+
+/* ===== interactive game overlay ===== */
+.game-overlay{position:fixed;inset:0;background:rgba(33,28,20,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:70;}
+.game-overlay.hidden{display:none;}
+.game-shell{background:var(--card);border-radius:20px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(33,28,20,.4);width:100%;max-width:640px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.game-shell::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold-soft),var(--gold),var(--accent-soft));z-index:2;}
+.game-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px 12px;}
+.game-title{font-family:"Fraunces",serif;font-weight:600;font-size:1.35rem;}
+.game-theme{font-size:.82rem;color:var(--ink-faint);margin-top:2px;}
+.game-x{background:transparent;border:none;font-size:1.3rem;color:var(--ink-faint);cursor:pointer;line-height:1;padding:4px 8px;border-radius:8px;}
+.game-x:hover{background:var(--paper);color:var(--ink);}
+.game-meta{padding:0 22px 14px;}
+.game-prog{height:8px;background:var(--paper);border-radius:6px;overflow:hidden;border:1px solid var(--line);}
+.game-prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold-soft),var(--gold));transition:width .4s ease;}
+.game-stats{font-size:.82rem;color:var(--ink-soft);margin-top:7px;font-weight:600;}
+#game-streak{color:var(--accent);margin-left:8px;}
+.game-body{padding:6px 22px 18px;overflow-y:auto;flex:1;}
+.game-foot{padding:14px 22px 20px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fffcf4;flex-wrap:wrap;}
+.game-feedback{font-size:.92rem;font-weight:600;flex:1;min-width:160px;}
+.game-feedback.good{color:var(--good);}
+.game-feedback.bad{color:var(--danger);}
+.g-instruction{font-size:1.02rem;font-weight:600;color:var(--ink);margin:8px 0 16px;line-height:1.45;}
+.g-target{font-family:"Fraunces",serif;font-weight:600;font-size:1.5rem;color:var(--accent);text-align:center;margin:6px 0 18px;}
+.g-sentence{font-family:"Newsreader",Georgia,serif;font-size:1.2rem;line-height:1.9;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+.g-blank{display:inline-block;min-width:74px;border-bottom:2px solid var(--accent);text-align:center;color:var(--accent);font-weight:600;}
+.g-input{width:100%;font-size:1.1rem;padding:13px 15px;border:2px solid var(--line);border-radius:11px;font-family:"Newsreader",Georgia,serif;}
+.g-input:focus{outline:none;border-color:var(--gold);}
+.g-hint{font-size:.85rem;color:var(--ink-faint);margin-top:10px;}
+.g-hint button{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;font-size:.85rem;padding:0;}
+
+/* chips / options */
+.g-chips{display:flex;flex-wrap:wrap;gap:9px;}
+.g-chip{font-size:.98rem;font-weight:600;padding:10px 16px;border-radius:11px;border:1.5px solid var(--line-strong);background:#fff;color:var(--ink);cursor:pointer;transition:.12s;user-select:none;}
+.g-chip:hover{border-color:var(--gold);}
+.g-chip.sel{background:var(--gold-wash);border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-wash);}
+.g-chip.correct{background:var(--good-wash);border-color:var(--good);color:var(--good);}
+.g-chip.wrong{background:var(--danger-wash);border-color:var(--danger);color:var(--danger);}
+.g-chip.disabled{opacity:.55;pointer-events:none;}
+
+/* sort buckets */
+.g-buckets{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+@media(max-width:520px){.g-buckets{grid-template-columns:1fr;}}
+.g-bucket{border:2px dashed var(--line-strong);border-radius:12px;padding:12px;min-height:96px;background:#fffdf7;}
+.g-bucket h5{margin:0 0 8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);text-align:center;}
+.g-bucket.syn{border-color:var(--gold-soft);}
+.g-bucket.ant{border-color:var(--accent-soft);}
+.g-bucket .drop{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;}
+
+/* match */
+.g-match{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g-col{display:flex;flex-direction:column;gap:8px;}
+.g-mitem{padding:11px 13px;border:1.5px solid var(--line-strong);border-radius:10px;background:#fff;cursor:pointer;font-size:.94rem;transition:.12s;}
+.g-mitem.sel{border-color:var(--gold);background:var(--gold-wash);}
+.g-mitem.paired{border-style:solid;}
+.g-mbadge{display:inline-block;width:18px;height:18px;border-radius:50%;color:#fff;font-size:.7rem;text-align:center;line-height:18px;margin-right:7px;font-weight:700;}
+
+/* build / order answer line */
+.g-answer{min-height:54px;border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:10px;display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:14px;}
+.g-answer:empty::before{content:"Tap words below to build your answer…";color:var(--ink-faint);font-size:.9rem;font-style:italic;}
+.g-bank{display:flex;flex-wrap:wrap;gap:8px;}
+.g-tile{font-size:.98rem;font-weight:600;padding:9px 14px;border-radius:10px;border:1.5px solid var(--line-strong);background:#fff;cursor:pointer;transition:.1s;font-family:"Newsreader",Georgia,serif;}
+.g-tile:hover{border-color:var(--gold);}
+.g-tile.placed{background:var(--gold-wash);border-color:var(--gold);}
+.g-tile.used{opacity:.32;pointer-events:none;}
+
+/* teach card */
+.g-teach{background:#fff;border:1.5px solid var(--gold-soft);border-radius:14px;padding:18px 20px;}
+.g-teach .gt-topic{font-family:"Fraunces",serif;font-weight:600;font-size:1.25rem;color:var(--accent);}
+.g-teach .gt-sub{font-size:.85rem;color:var(--ink-faint);margin-bottom:12px;}
+.g-teach .gt-k{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold);margin-top:14px;}
+.g-teach p{margin:4px 0 0;font-size:.96rem;color:var(--ink-soft);}
+.g-teach .gt-form{font-family:"Newsreader",Georgia,serif;font-size:1.1rem;color:var(--ink);background:var(--gold-wash);border-radius:8px;padding:8px 12px;margin-top:4px;display:inline-block;}
+.g-teach .gt-ex{font-family:"Newsreader",Georgia,serif;font-size:1.02rem;color:var(--ink);margin:3px 0;}
+.g-teach .gt-err{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+@media(max-width:520px){.g-teach .gt-err{grid-template-columns:1fr;}}
+.g-teach .gt-wrong{background:var(--danger-wash);border:1px solid #f3c9c6;border-radius:8px;padding:8px 11px;font-size:.92rem;}
+.g-teach .gt-right{background:var(--good-wash);border:1px solid #d8e4bf;border-radius:8px;padding:8px 11px;font-size:.92rem;}
+
+/* final score */
+.g-final{text-align:center;padding:14px 6px 6px;}
+.g-final .gf-big{font-family:"Fraunces",serif;font-size:3rem;font-weight:600;color:var(--gold);}
+.g-final .gf-stars{font-size:2rem;letter-spacing:6px;margin:8px 0;}
+.g-final .gf-msg{font-size:1.05rem;color:var(--ink-soft);margin-bottom:8px;}
+.tile-launch{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+
+/* upgrades split screen */
+.up-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--gold-wash);border:1.5px solid var(--gold-soft);border-radius:12px;padding:14px 20px;margin-bottom:18px;}
+.up-head .lvls{display:flex;align-items:center;gap:12px;font-family:"Fraunces",serif;font-size:1.3rem;font-weight:600;}
+.up-head .lv{color:#fff;background:var(--ink-soft);border-radius:9px;padding:4px 14px;}
+.up-head .lv.target{background:var(--gold);}
+.up-head .arrow{color:var(--gold);font-size:1.5rem;}
+.cefr-row{display:flex;gap:5px;flex-wrap:wrap;}
+.cefr-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px;background:var(--gold-wash);border:1px solid var(--gold-soft);border-radius:10px;padding:9px 14px;}
+.cefr-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);}
+.cefr-btn{font-family:"Inter",sans-serif;font-size:.84rem;font-weight:700;border:1.5px solid var(--line-strong);background:#fff;color:var(--ink-soft);border-radius:8px;padding:5px 12px;cursor:pointer;transition:.12s;min-width:38px;}
+.cefr-btn:hover:not(:disabled):not(.active){border-color:var(--gold);color:var(--accent);}
+.cefr-btn.active{background:var(--gold);border-color:var(--gold);color:#fff;cursor:default;}
+.cefr-btn.gen{border-color:var(--gold-soft);color:var(--gold);}
+.cefr-btn.gen::after{content:" ✓";font-size:.7rem;}
+.cefr-btn.addable{border-style:dashed;color:var(--accent);border-color:var(--accent-soft);}
+.cefr-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--paper);color:var(--ink-faint);}
+.legend{display:flex;gap:16px;font-size:.82rem;color:var(--ink-soft);flex-wrap:wrap;}
+.lg{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:14px;height:14px;border-radius:4px;display:inline-block;}
+.swatch.v{background:var(--gold-wash);border:1.5px solid var(--gold);}
+.swatch.g{background:var(--accent-wash);border:1.5px solid var(--accent-soft);}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:860px){.split{grid-template-columns:1fr;}}
+.essay-pane{background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-height:300px;}
+.essay-pane .ep-head{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--paper);border-radius:12px 12px 0 0;}
+.essay-pane .ep-title{font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);}
+.essay-pane .ep-lv{font-size:.8rem;color:#fff;background:var(--ink-soft);border-radius:7px;padding:2px 10px;font-weight:600;}
+.essay-pane.target .ep-lv{background:var(--gold);}
+.essay-body{font-family:"Newsreader",Georgia,serif;font-size:1.08rem;line-height:1.9;padding:20px 22px;white-space:pre-wrap;overflow-y:auto;max-height:520px;flex:1;}
+.seg{border-radius:5px;padding:1px 3px;cursor:pointer;transition:background .15s,box-shadow .15s;}
+.seg.seg-v{background:var(--gold-wash);box-shadow:inset 0 -2px 0 var(--gold);}
+.seg.seg-g{background:var(--accent-wash);box-shadow:inset 0 -2px 0 var(--accent-soft);}
+.seg.lit{background:var(--gold);color:#fff;box-shadow:0 0 0 2px var(--gold);}
+.seg.seg-g.lit{background:var(--accent);box-shadow:0 0 0 2px var(--accent);}
+.seg.pinned{outline:2px dashed var(--ink-soft);outline-offset:1px;}
+.detail-card{display:none;background:#fff;border:1.5px solid var(--gold-soft);border-radius:12px;padding:18px 20px;margin-top:18px;box-shadow:var(--shadow);}
+.detail-card.show{display:block;animation:fade .25s ease both;}
+.detail-card .dk{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;}
+.detail-card .dpair{font-family:"Newsreader",Georgia,serif;font-size:1.12rem;margin:6px 0 10px;}
+.detail-card .dpair .from{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--accent-soft);}
+.detail-card .dpair .to{color:var(--accent);font-weight:600;}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 22px;font-size:.9rem;color:var(--ink-soft);}
+.detail-grid b{color:var(--ink);}
+.dlink{margin-top:12px;}
+.dlink a{color:var(--accent);font-weight:600;font-size:.88rem;cursor:pointer;text-decoration:underline;}
+.up-hint{font-size:.86rem;color:var(--ink-faint);margin:10px 0 16px;}
+
+/* vocab & grammar tables */
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;}
+.vtable{width:100%;border-collapse:collapse;font-size:.88rem;min-width:1100px;}
+.vtable th{background:var(--paper);text-align:left;padding:11px 12px;border-bottom:2px solid var(--line-strong);border-right:1px solid var(--line);color:var(--ink-soft);font-weight:700;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;}
+.vtable td{padding:13px 12px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;line-height:1.5;}
+.vtable tr:nth-child(even){background:#faf8f5;}
+.vtable tr.flash{background:var(--gold-wash);}
+.lv-tag{display:inline-block;font-size:.72rem;font-weight:700;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line-strong);border-radius:6px;padding:1px 7px;margin-left:5px;white-space:nowrap;}
+.lv-tag.up{color:#fff;background:var(--gold);border-color:var(--gold);}
+.word-strong{font-family:"Newsreader",Georgia,serif;font-size:1.02rem;font-weight:600;}
+.mini-list{margin:0;padding-left:16px;}
+.mini-list li{margin-bottom:4px;}
+.gid{font-family:"Fraunces",serif;font-weight:600;color:#fff;background:var(--accent);min-width:30px;height:24px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;}
+.gid.v{background:var(--gold);}
+
+/* history */
+.hist-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.hist-row .field{flex:1;min-width:220px;margin-bottom:0;}
+.hist-list{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+.hist-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 16px;font-size:.9rem;flex-wrap:wrap;}
+.hist-item .hmeta{color:var(--ink-faint);font-size:.82rem;}
+
+@media print{
+  body{padding:0;background:#fff;}
+  .container{border:none;box-shadow:none;border-radius:0;}
+  .tabs,.topbar,.report-actions,#screen-assess,.overlay{display:none !important;}
+  .screen{display:none !important;}
+  .screen.print-target{display:block !important;}
+  .essay-body{max-height:none;overflow:visible;}
+  .table-scroll{overflow:visible;border:none;}
+  .vtable{min-width:0;font-size:.74rem;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <div>
+      <div class="brand-sub">Satriwithaya School &middot; English Program</div>
+      <h1>Essay Marker</h1>
+      <p class="lede">Paste a prompt and a student response. Claude assesses against CEFR criteria, rewrites the essay one level higher, and catalogues every vocabulary and grammar upgrade for follow-up lessons.</p>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-screen="login" id="tab-login" style="display:none">Login</button>
+    <button class="tab active" data-screen="assess" id="tab-assess">1 &middot; Assessment</button>
+    <button class="tab" data-screen="report" id="tab-report" disabled>2 &middot; Report</button>
+    <button class="tab" data-screen="upgrades" id="tab-upgrades" disabled>3 &middot; Recommended upgrades</button>
+    <button class="tab" data-screen="vocab" id="tab-vocab" disabled>4 &middot; Vocabulary<span class="tcount" id="vcount" style="display:none"></span></button>
+    <button class="tab" data-screen="grammar" id="tab-grammar" disabled>5 &middot; Grammar<span class="tcount" id="gcount" style="display:none"></span></button>
+    <button class="tab" data-screen="studio" id="tab-studio" disabled>6 &middot; Lesson Studio</button>
+  </nav>
+
+  <main>
+    <!-- ============ 0 · LOGIN (student console only) ============ -->
+    <section class="screen" id="screen-login">
+      <div class="pane" style="max-width:560px;margin:8px auto;text-align:center">
+        <h2 style="margin-bottom:8px">Welcome to the AI powered Writing Improvement Coach Console (AIWICC)</h2>
+        <p class="lede" style="margin:0 auto 22px">Enter your Respondent's ID to retrieve your writing report and your personalised improvement coach.</p>
+        <div class="field" style="text-align:left">
+          <label for="login-id">Respondent's ID</label>
+          <input type="text" id="login-id" placeholder="Your ID (e.g. your Line ID)" autocomplete="off">
+        </div>
+        <button class="main" type="button" id="login-btn">Search record</button>
+        <div class="err-box" id="login-err"></div>
+      </div>
+    </section>
+
+    <!-- ============ 1 · ASSESSMENT ============ -->
+    <section class="screen active" id="screen-assess">
+      <div class="pane">
+        <div class="pane-title">Student</div>
+        <div class="field">
+          <label for="student-name">Respondent's ID</label>
+          <input type="text" id="student-name" placeholder="e.g. Praewa T. (M4/1)" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="pane">
+        <div class="pane-title">Prompt given to the student</div>
+        <div class="field">
+          <label for="prompt-text">Prompt</label>
+          <textarea id="prompt-text" placeholder="Paste the writing prompt exactly as the student received it…"></textarea>
+        </div>
+        <div class="file-row">
+          <input type="file" id="prompt-file-input" accept=".txt,.md,.docx,.pdf,.jpg,.jpeg,.png,.webp,.gif" style="display:none">
+          <button class="ghost" id="prompt-attach-btn" type="button">📎 Attach file</button>
+          <button class="ghost" id="prompt-read-btn" type="button" disabled>📖 Read file</button>
+          <span class="file-chip" id="prompt-file-chip" style="display:none"></span>
+        </div>
+        <div class="frow">
+          <div></div>
+          <div class="field">
+            <label for="target-words">Target word count</label>
+            <input type="number" id="target-words" min="0" step="10" placeholder="e.g. 250">
+          </div>
+          <div class="field">
+            <label for="time-limit">Time limit (minutes)</label>
+            <input type="number" id="time-limit" min="0" step="5" placeholder="e.g. 40">
+          </div>
+        </div>
+      </div>
+
+      <div class="pane">
+        <div class="pane-title">Student's response</div>
+        <div class="field">
+          <label for="essay-text">Response text</label>
+          <textarea id="essay-text" placeholder="Paste the student's response here, or attach a file below and choose Read file…"></textarea>
+          <div class="wc-row">
+            <span class="wc-count">Words: <b id="wc">0</b></span>
+            <span id="wc-target-note" style="display:none"></span>
+          </div>
+        </div>
+        <div class="file-row">
+          <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf,.jpg,.jpeg,.png,.webp,.gif" style="display:none">
+          <button class="ghost" id="attach-btn" type="button">📎 Attach file</button>
+          <button class="ghost" id="read-btn" type="button" disabled>📖 Read file</button>
+          <span class="file-chip" id="file-chip" style="display:none"></span>
+        </div>
+        <p class="up-hint" style="margin:12px 0 0">Typed files (.txt, .docx) are read instantly in the browser. Photos and PDFs of handwriting are transcribed by Claude OCR — spelling and grammar errors are kept exactly as written so the assessment stays honest.</p>
+      </div>
+
+      <button class="main" id="submit-btn" type="button">Submit for analysis</button>
+      <div class="err-box" id="assess-err"></div>
+
+      <div class="pane" style="margin-top:26px">
+        <div class="pane-title">Load a past assessment</div>
+        <div class="hist-row">
+          <div class="field">
+            <label for="hist-name">Respondent's ID</label>
+            <input type="text" id="hist-name" placeholder="Exact ID used at submission">
+          </div>
+          <button class="ghost" id="hist-btn" type="button">Find assessments</button>
+        </div>
+        <div class="hist-list" id="hist-list"></div>
+      </div>
+    </section>
+
+    <!-- ============ 2 · REPORT ============ -->
+    <section class="screen" id="screen-report">
+      <div class="report-actions">
+        <button class="ghost" type="button" onclick="printScreen('screen-report')">🖨 Print report</button>
+        <span class="save-note" id="save-note" style="display:none"></span>
+      </div>
+      <div id="report-body"></div>
+    </section>
+
+    <!-- ============ 3 · RECOMMENDED UPGRADES ============ -->
+    <section class="screen" id="screen-upgrades">
+      <div class="up-head">
+        <div class="lvls">
+          <span>Overall CEFR</span>
+          <span class="lv" id="up-from">—</span>
+          <span class="arrow">→</span>
+          <span class="lv target" id="up-to">—</span>
+        </div>
+        <div class="legend">
+          <span class="lg"><span class="swatch v"></span> Vocabulary upgrade</span>
+          <span class="lg"><span class="swatch g"></span> Grammar upgrade</span>
+        </div>
+      </div>
+      <p class="up-hint">Tap or hover any highlighted block — the matching block lights up in the other pane and its details appear below. Click again to unpin.</p>
+      <div class="split">
+        <div class="essay-pane" id="pane-orig">
+          <div class="ep-head"><span class="ep-title">Student's original</span><span class="ep-lv" id="orig-lv">—</span></div>
+          <div class="essay-body" id="orig-body"></div>
+        </div>
+        <div class="essay-pane target" id="pane-upg">
+          <div class="ep-head">
+            <span class="ep-title">Upgraded to:</span>
+            <div class="cefr-row" id="upg-cefr-row"></div>
+          </div>
+          <div class="essay-body" id="upg-body"></div>
+        </div>
+      </div>
+      <div class="detail-card" id="detail-card"></div>
+      <div class="pane" style="margin-top:22px">
+        <div class="pane-title">Upgrade strategy</div>
+        <p class="feedback-text" id="up-summary"></p>
+      </div>
+    </section>
+
+    <!-- ============ 4 · VOCABULARY ============ -->
+    <section class="screen" id="screen-vocab">
+      <div class="report-actions">
+        <button class="ghost" type="button" onclick="printScreen('screen-vocab')">🖨 Print table</button>
+        <button class="ghost" type="button" id="vocab-export-btn">📤 Export to Google Sheet</button>
+        <button class="ghost" type="button" id="vocab-blooket-btn">🎮 Generate Blooket game file</button>
+        <button class="ghost" type="button" id="vocab-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
+      </div>
+      <div class="tool-note" id="vocab-note"></div>
+      <h2>Vocabulary upgrade table</h2>
+      <div class="cefr-bar"><span class="cefr-label">Showing upgrade level:</span><div class="cefr-row" id="vocab-cefr-row"></div></div>
+      <p class="lede" style="margin-bottom:16px">Each row swaps a word or phrase from the student's response for one at the selected CEFR level — with everything a tutor needs to teach it.</p>
+      <div class="table-scroll"><table class="vtable" id="vocab-table"></table></div>
+    </section>
+
+    <!-- ============ 5 · GRAMMAR ============ -->
+    <section class="screen" id="screen-grammar">
+      <div class="report-actions">
+        <button class="ghost" type="button" onclick="printScreen('screen-grammar')">🖨 Print table</button>
+        <button class="ghost" type="button" id="grammar-export-btn">📤 Export to Google Sheet</button>
+        <button class="ghost" type="button" id="grammar-blooket-btn">🎮 Generate Blooket game file</button>
+        <button class="ghost" type="button" id="grammar-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
+      </div>
+      <div class="tool-note" id="grammar-note"></div>
+      <h2>Grammar upgrade table</h2>
+      <div class="cefr-bar"><span class="cefr-label">Showing upgrade level:</span><div class="cefr-row" id="grammar-cefr-row"></div></div>
+      <p class="lede" style="margin-bottom:16px">Each row lifts a structure from the student's response to the selected CEFR level, names the grammar topic, and gives a lesson-ready improvement path.</p>
+      <div class="table-scroll"><table class="vtable" id="grammar-table"></table></div>
+    </section>
+
+    <!-- ============ 6 · LESSON STUDIO ============ -->
+    <section class="screen" id="screen-studio">
+      <h2>Lesson Studio</h2>
+      <p class="lede" style="margin-bottom:20px">Everything here is generated from <b id="studio-name">this student</b>'s own essay — the target vocabulary and grammar from the upgrade tables are recycled through every material, pitched at the upgrade level (<b id="studio-level">—</b>).</p>
+
+      <div class="pane" id="studio-plan-pane">
+        <div class="pane-title">Interactive lesson plan <button class="ghost" type="button" id="plan-btn">✨ Generate 50-minute session</button></div>
+        <p class="up-hint" style="margin:0">A themed, story-driven session: warm-up → input → practice → immersive production → exit ticket, with media moments and a real-life transfer stage.</p>
+        <div class="tool-note" id="plan-note"></div>
+        <div id="plan-body"></div>
+      </div>
+
+      <div class="pane" id="studio-materials-pane">
+        <div class="pane-title">Teaching materials</div>
+        <p class="up-hint" style="margin:0 0 16px">Each generator writes a ready-to-use file to your Google Drive. All recycle the target language and theme the content around teen life.</p>
+        <div class="studio-grid">
+          <div class="mat-card">
+            <div class="mat-ico">🖥️</div><h3>Slide deck</h3>
+            <p>12–16 interactive Google Slides: hook story, vocab slides with "your turn" tasks, grammar transformations, activities — tutor script in the speaker notes.</p>
+            <button class="ghost" type="button" data-mat="slides">Generate Slides</button>
+            <div class="tool-note" id="mat-slides-note"></div>
+          </div>
+          <div class="mat-card">
+            <div class="mat-ico">🎙️</div><h3>Podcast script</h3>
+            <p>A 6–8 minute two-host teen podcast on the essay topic with jingle/pause cues. Read it aloud together, then the listener challenge has the student record her own reply.</p>
+            <button class="ghost" type="button" data-mat="podcast">Generate script</button>
+            <div class="tool-note" id="mat-podcast-note"></div>
+          </div>
+          <div class="mat-card">
+            <div class="mat-ico">🎵</div><h3>Song &amp; chant pack</h3>
+            <p>An original pop-style song whose chorus drills the target vocab and whose verses showcase the grammar, plus a call-and-response chant and karaoke gap lines.</p>
+            <button class="ghost" type="button" data-mat="song">Generate song</button>
+            <div class="tool-note" id="mat-song-note"></div>
+          </div>
+          <div class="mat-card">
+            <div class="mat-ico">📱</div><h3>Video storyboard</h3>
+            <p>A 60–90s TikTok-style vertical video plan: shot-by-shot storyboard with spoken lines that recycle the targets, a 3-second hook, and phone filming/editing tips.</p>
+            <button class="ghost" type="button" data-mat="video">Generate storyboard</button>
+            <div class="tool-note" id="mat-video-note"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane">
+        <div class="pane-title">Role-play arcade <span style="font-size:.78rem;font-weight:400;color:var(--ink-faint)">immersive practice, right here</span></div>
+        <p class="up-hint" style="margin:0 0 14px">Claude builds a real-life scenario from the essay topic and plays a character. The student chats in role and tries to light up every target word below. A coach whispers one tip per turn.</p>
+        <div id="rp-setup">
+          <button class="main" type="button" id="rp-start" style="margin-top:0">🎭 Start a role-play</button>
+        </div>
+        <div id="rp-stage" style="display:none">
+          <div class="rp-scenario" id="rp-scenario"></div>
+          <div class="rp-chips" id="rp-chips"></div>
+          <div class="rp-chat" id="rp-chat"></div>
+          <div class="rp-coach" id="rp-coach" style="display:none"></div>
+          <div class="rp-inputrow">
+            <textarea id="rp-input" rows="2" placeholder="Type the student's reply in role…"></textarea>
+            <button class="ghost" type="button" id="rp-send">Send ↩</button>
+          </div>
+          <div class="file-row" style="margin-top:10px">
+            <button class="ghost" type="button" id="rp-new">↻ New scenario</button>
+            <span class="up-hint" id="rp-progress" style="margin:0"></span>
+          </div>
+        </div>
+        <div class="tool-note" id="rp-note"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="game-overlay hidden" id="game-overlay">
+  <div class="game-shell">
+    <div class="game-top">
+      <div>
+        <div class="game-title" id="game-title">Vocabulary Quest</div>
+        <div class="game-theme" id="game-theme"></div>
+      </div>
+      <button class="game-x" id="game-close" type="button" aria-label="Close game">✕</button>
+    </div>
+    <div class="game-meta">
+      <div class="game-prog"><div class="game-prog-fill" id="game-prog-fill"></div></div>
+      <div class="game-stats"><span id="game-step">—</span> &middot; <span id="game-score">0</span> pts<span id="game-streak"></span></div>
+    </div>
+    <div class="game-body" id="game-body"></div>
+    <div class="game-foot">
+      <div class="game-feedback" id="game-feedback"></div>
+      <button class="main" id="game-action" type="button" style="margin-top:0;width:auto;min-width:150px">Check</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="loading">
+  <div class="tile">
+    <div class="spinner"></div>
+    <div class="stage" id="load-stage">Working…</div>
+    <p id="load-sub"></p>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+ * CONFIG — paste your Apps Script Web App /exec URL here.
+ * After every backend edit: Deploy → Manage deployments →
+ * pencil → New version (the /exec URL only updates then).
+ * ============================================================ */
+const API_URL = "https://script.google.com/macros/s/AKfycbzZ6uU_qYiX8XWvXIp_tvos7s9d20nbKSTkeRoQW24G9HXtQvtdaKoQhh1as_BCVZSU/exec";
+
+/* ROLE is the ONLY line that differs between the two consoles.
+ * teacher.html → "teacher"   |   student.html → "student" */
+const ROLE = "student";
+const IS_STUDENT = (ROLE === "student");
+
+const BANDS = ["Pre-A1","A1","A2","B1","B2","C1","C2"];
+const BTN_BANDS = ["A1","A2","B1","B2","C1","C2"];   // selectable upgrade targets
+const BAND_SCORE = {"Pre-A1":0,"A1":17,"A2":33,"B1":50,"B2":67,"C1":83,"C2":100};
+const bandIdx = b => BANDS.indexOf(b);
+
+let current = null;     // {meta, essay, data}
+let activeLevel = null; // the CEFR level currently being viewed across tabs
+let upgradeBusy = false;
+
+/* ---- level accessors (new level-keyed data model) ---- */
+function migrateClientData(data){
+  if (!data) return data;
+  if (!data.upgrades && data.upgrade){
+    const lvl = data.upgrade.targetLevel || BANDS[Math.min(BANDS.length-1, bandIdx(data.assessment&&data.assessment.overallLevel)+1)];
+    data.defaultLevel = lvl;
+    data.upgrades = {}; data.upgrades[lvl] = {
+      targetLevel:lvl, summary:data.upgrade.summary||'',
+      originalAnnotated:data.upgrade.originalAnnotated||'', upgradedAnnotated:data.upgrade.upgradedAnnotated||'',
+      vocabUpgrades:data.vocabUpgrades||[], grammarUpgrades:data.grammarUpgrades||[]
+    };
+  }
+  if (!data.upgrades) data.upgrades = {};
+  if (!data.defaultLevel) data.defaultLevel = Object.keys(data.upgrades)[0] || 'B1';
+  return data;
+}
+function levelData(){ return (current && current.data.upgrades[activeLevel]) || {vocabUpgrades:[],grammarUpgrades:[],summary:'',originalAnnotated:'',upgradedAnnotated:'',targetLevel:activeLevel}; }
+function vocabRows(){ return levelData().vocabUpgrades || []; }
+function grammarRows(){ return levelData().grammarUpgrades || []; }
+function generatedLevels(){ return current ? Object.keys(current.data.upgrades).sort((a,b)=>bandIdx(a)-bandIdx(b)) : []; }
+
+/* ---------------- helpers ---------------- */
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function showErr(msg){ const b=$('assess-err'); b.textContent=msg; b.classList.add('show'); }
+function clearErr(){ $('assess-err').classList.remove('show'); }
+function loading(on, stage, sub){
+  $('loading').classList.toggle('hidden', !on);
+  if (stage) $('load-stage').textContent = stage;
+  $('load-sub').textContent = sub || '';
+}
+async function api(body){
+  const res = await fetch(API_URL, { method:'POST', body: JSON.stringify(body) }); // text/plain → no CORS preflight
+  if (!res.ok) throw new Error('Server error ' + res.status);
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Unknown server error');
+  return data;
+}
+function validatedWordCount(text){
+  const toks = String(text||'').toLowerCase().match(/[a-z'\u2019-]+/g) || [];
+  const shortOk = {a:1,i:1,o:1}; let n=0;
+  for (let raw of toks){
+    const t = raw.replace(/^[-'\u2019]+|[-'\u2019]+$/g,'');
+    if (!t || t.length>20 || /^(.)\1+$/.test(t)) continue;
+    if (t.length===1){ if (shortOk[t]) n++; continue; }
+    if (/[aeiouy]/.test(t)){ n++; continue; }
+    if (/^(mr|mrs|ms|dr|tv|pm|am|by|my|hymn|rhythm)$/.test(t)) n++;
+  }
+  return n;
+}
+
+/* ---------------- tabs ---------------- */
+const tabs = Array.from(document.querySelectorAll('.tab'));
+tabs.forEach(t => t.addEventListener('click', () => { if (!t.disabled) showScreen(t.dataset.screen); }));
+function showScreen(name){
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.screen===name));
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id==='screen-'+name));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function unlockTabs(){ tabs.forEach(t => { if (t.dataset.screen==='login') return; if (IS_STUDENT && t.dataset.screen==='assess') return; t.disabled = false; }); }
+window.printScreen = function(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('print-target', s.id===id));
+  window.print();
+};
+
+/* ---------------- role configuration & student login ---------------- */
+function configureRole(){
+  if (!IS_STUDENT) return;   // teacher console is the default markup
+  document.title = 'AIWICC — Writing Improvement Coach';
+  $('tab-assess').style.display = 'none';
+  $('tab-login').style.display = '';
+  // Tab numbering for the student console (no Assessment tab)
+  $('tab-report').innerHTML = '1 &middot; Report';
+  $('tab-upgrades').innerHTML = '2 &middot; Recommended upgrades';
+  $('tab-vocab').innerHTML = '3 &middot; Vocabulary<span class="tcount" id="vcount" style="display:none"></span>';
+  $('tab-grammar').innerHTML = '4 &middot; Grammar<span class="tcount" id="gcount" style="display:none"></span>';
+  $('tab-studio').innerHTML = '5 &middot; Role-play';
+  // Hide Blooket buttons
+  ['vocab','grammar'].forEach(k => { const b = $(k+'-blooket-btn'); if (b) b.style.display = 'none'; });
+  // Trim Lesson Studio to the role-play arcade only
+  const pp = $('studio-plan-pane'); if (pp) pp.style.display = 'none';
+  const mp = $('studio-materials-pane'); if (mp) mp.style.display = 'none';
+  const sh2 = document.querySelector('#screen-studio h2'); if (sh2) sh2.textContent = 'Role-play Arcade';
+  const intro = document.querySelector('#screen-studio > p.lede'); if (intro) intro.style.display = 'none';
+  // Top-bar copy
+  const h1 = document.querySelector('.topbar h1'); if (h1) h1.textContent = 'Writing Improvement Coach';
+  const lede = document.querySelector('.topbar .lede');
+  if (lede) lede.textContent = 'Log in with your Respondent\u2019s ID to see your report, your upgraded writing, and to practise with your AI coach.';
+  // Show the login screen first
+  showScreen('login');
+}
+if (IS_STUDENT){
+  $('login-btn').addEventListener('click', studentLogin);
+  $('login-id').addEventListener('keydown', e => { if (e.key==='Enter'){ e.preventDefault(); studentLogin(); } });
+}
+async function studentLogin(){
+  const errBox = $('login-err');
+  errBox.classList.remove('show');
+  const rid = $('login-id').value.trim();
+  if (!rid){ errBox.textContent = 'Please enter your Respondent\u2019s ID.'; errBox.classList.add('show'); return; }
+  try {
+    loading(true, 'Finding your record…');
+    const out = await api({ action:'get_by_id', rid:rid });
+    loading(false);
+    current = { meta: out.record.meta, essay: out.record.essay, data: migrateClientData(out.record.data) };
+    activeLevel = current.data.defaultLevel;
+    renderAll();
+    showScreen('report');
+  } catch(err){
+    loading(false);
+    errBox.textContent = (/no record/i.test(err.message))
+      ? 'No matching record was found for that ID. Please check your Respondent\u2019s ID and try again.'
+      : ('Could not load your record: ' + err.message);
+    errBox.classList.add('show');
+  }
+}
+
+
+$('target-words').addEventListener('input', updateWC);
+function updateWC(){
+  const wc = validatedWordCount($('essay-text').value);
+  $('wc').textContent = wc;
+  const target = Number($('target-words').value)||0;
+  const note = $('wc-target-note');
+  if (target){
+    note.style.display='';
+    const pct = Math.round(wc/target*100);
+    note.textContent = pct + '% of the ' + target + '-word target';
+  } else note.style.display='none';
+}
+
+/* ---------------- file attach & read (essay + prompt slots) ---------------- */
+function setupFileSlot(opts){
+  // opts: {attachId, readId, inputId, chipId, targetId, append}
+  let file = null;
+  $(opts.attachId).addEventListener('click', () => $(opts.inputId).click());
+  $(opts.inputId).addEventListener('change', e => {
+    file = e.target.files[0] || null;
+    const chip = $(opts.chipId);
+    if (file){
+      chip.textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+      chip.style.display = '';
+      $(opts.readId).disabled = false;
+    } else { chip.style.display='none'; $(opts.readId).disabled = true; }
+  });
+  $(opts.readId).addEventListener('click', async () => {
+    if (!file) return;
+    clearErr();
+    const name = file.name.toLowerCase();
+    const mime = file.type || '';
+    try {
+      if (name.endsWith('.txt') || name.endsWith('.md')){
+        placeText(opts.targetId, await file.text(), opts.append);
+      } else if (name.endsWith('.docx')){
+        loading(true, 'Reading document…');
+        const buf = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buf });
+        loading(false);
+        placeText(opts.targetId, result.value || '', opts.append);
+      } else if (mime === 'application/pdf' || name.endsWith('.pdf') || mime.startsWith('image/')){
+        const limitMB = mime.startsWith('image/') ? 4.5 : 15;
+        if (file.size > limitMB*1024*1024){
+          return showErr('File too large for OCR (max ' + limitMB + ' MB). Try a smaller photo or split the PDF.');
+        }
+        loading(true, 'Transcribing with Claude OCR…', 'Text is kept exactly as written — errors included.');
+        const b64 = await fileToBase64(file);
+        const resolvedMime = mime || (name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+        const out = await api({ action:'ocr', mimeType:resolvedMime, data:b64, filename:file.name });
+        loading(false);
+        placeText(opts.targetId, out.text, opts.append);
+      } else {
+        showErr('Unsupported file type. Use .txt, .docx, .pdf or a photo (.jpg/.png/.webp).');
+      }
+    } catch(err){
+      loading(false);
+      showErr('Could not read the file: ' + err.message);
+    }
+  });
+}
+function placeText(targetId, text, append){
+  text = String(text||'').trim();
+  if (!text) return showErr('The file appears to contain no readable text.');
+  const box = $(targetId);
+  box.value = (append && box.value.trim()) ? (box.value.trim() + '\n\n' + text) : text;
+  if (targetId === 'essay-text') updateWC();
+  box.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function fileToBase64(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1]);
+    r.onerror = () => rej(new Error('File read failed'));
+    r.readAsDataURL(file);
+  });
+}
+setupFileSlot({ attachId:'attach-btn', readId:'read-btn', inputId:'file-input', chipId:'file-chip', targetId:'essay-text', append:true });
+setupFileSlot({ attachId:'prompt-attach-btn', readId:'prompt-read-btn', inputId:'prompt-file-input', chipId:'prompt-file-chip', targetId:'prompt-text', append:false });
+
+/* ---------------- submit for analysis ---------------- */
+$('submit-btn').addEventListener('click', submit);
+async function submit(){
+  clearErr();
+  const name  = $('student-name').value.trim();
+  const essay = $('essay-text').value.trim();
+  if (!name)  return showErr("Please enter the respondent's name.");
+  if (!essay) return showErr("Please paste or read in the student's response.");
+  if (validatedWordCount(essay) < 5) return showErr('The response has fewer than 5 recognisable words — nothing to assess yet.');
+  if (API_URL.indexOf('http') !== 0) return showErr('The backend URL has not been configured yet (see API_URL at the top of the script).');
+
+  const stages = [
+    ['Assessing against CEFR descriptors…', 'Scoring task achievement, cohesion, lexis and grammar with evidence.'],
+    ['Writing the upgraded response…', 'Preserving the student\u2019s ideas, lifting the language one level.'],
+    ['Cataloguing vocabulary & grammar upgrades…', 'Building the tutor follow-up tables.']
+  ];
+  let si = 0;
+  loading(true, stages[0][0], stages[0][1]);
+  const ticker = setInterval(() => { si = Math.min(si+1, stages.length-1); loading(true, stages[si][0], stages[si][1]); }, 9000);
+
+  try {
+    const out = await api({
+      action:'analyze', name:name,
+      prompt: $('prompt-text').value.trim(),
+      targetWords: Number($('target-words').value)||0,
+      timeLimit: Number($('time-limit').value)||0,
+      essay: essay
+    });
+    clearInterval(ticker); loading(false);
+    current = { meta: out.data.meta, essay: essay, data: migrateClientData(out.data) };
+    activeLevel = current.data.defaultLevel;
+    renderAll();
+    showScreen('report');
+  } catch(err){
+    clearInterval(ticker); loading(false);
+    showErr('Analysis failed: ' + err.message);
+  }
+}
+
+/* ---------------- history ---------------- */
+$('hist-btn').addEventListener('click', async () => {
+  clearErr();
+  const name = $('hist-name').value.trim();
+  if (!name) return showErr('Enter a student name to look up past assessments.');
+  try {
+    loading(true, 'Searching past assessments…');
+    const out = await api({ action:'history', name:name });
+    loading(false);
+    const list = $('hist-list');
+    if (!out.items.length){ list.innerHTML = '<div class="hist-item">No stored assessments for “'+esc(name)+'” yet.</div>'; return; }
+    list.innerHTML = out.items.map(it => (
+      '<div class="hist-item"><div><b>'+esc(it.overallLevel)+'</b> → '+esc(it.upgradeLevel)+
+      ' &middot; '+it.wordCount+' words<div class="hmeta">'+new Date(it.date).toLocaleString()+
+      (it.promptPreview ? ' &middot; '+esc(it.promptPreview)+'…' : '')+'</div></div>'+
+      '<button class="ghost" data-id="'+esc(it.id)+'">Open</button></div>'
+    )).join('');
+    list.querySelectorAll('button[data-id]').forEach(b => b.addEventListener('click', () => loadStored(b.dataset.id)));
+  } catch(err){ loading(false); showErr(err.message); }
+});
+async function loadStored(id){
+  try {
+    loading(true, 'Loading stored assessment…');
+    const out = await api({ action:'get', id:id });
+    loading(false);
+    current = { meta: out.record.meta, essay: out.record.essay, data: migrateClientData(out.record.data) };
+    current.data.savedId = id;
+    current.data.saveWarning = null;
+    activeLevel = current.data.defaultLevel;
+    renderAll();
+    showScreen('report');
+  } catch(err){ loading(false); showErr(err.message); }
+}
+
+/* ============================================================
+ * RENDERING
+ * ============================================================ */
+function renderAll(){
+  unlockTabs();
+  renderReport();
+  renderUpgrades();
+  renderVocabTable();
+  renderGrammarTable();
+  resetStudio();
+  $('vcount').textContent = vocabRows().length;
+  $('gcount').textContent = grammarRows().length;
+  $('vcount').style.display = $('gcount').style.display = '';
+}
+
+/* -------- 2 · report -------- */
+function renderReport(){
+  const d = current.data, a = d.assessment, m = current.meta || {};
+  const note = $('save-note');
+  if (d.saveWarning){ note.textContent = '⚠ ' + d.saveWarning; note.className='save-note warn'; note.style.display=''; }
+  else if (d.savedId){ note.textContent = '✓ Saved to the Google Sheet (record ' + d.savedId + ')'; note.className='save-note'; note.style.display=''; }
+  else note.style.display='none';
+
+  const DIMS = [
+    ['taskAchievement','Task achievement','Relevance, coverage of the prompt, development of ideas'],
+    ['coherenceCohesion','Coherence & cohesion','Organisation and the range of linking devices exhibited'],
+    ['lexicalResource','Lexical resource','Vocabulary range, precision and collocation'],
+    ['grammaticalRange','Grammatical range & accuracy','Variety and control of structures']
+  ];
+  const dimRows = DIMS.map(([k,label,sub]) => (
+    '<div class="dim-row"><div class="dim-name">'+label+'<span class="dband">'+esc(a.bands[k])+'</span>'+
+    '<span class="dim-sub">'+sub+'</span></div><div>'+
+    '<div class="bar-wrap"><div class="bar-fill" style="width:'+a.scores[k]+'%"></div></div>'+
+    '<div class="bar-labels">'+BANDS.map(b=>'<span>'+b+'</span>').join('')+'</div>'+
+    (a.evidence[k] ? '<div class="dim-ev">'+esc(a.evidence[k])+'</div>' : '')+
+    '</div></div>'
+  )).join('');
+
+  const errRows = (a.errorPatterns||[]).map(e => (
+    '<tr><td><b>'+esc(e.issue)+'</b><br><span style="font-size:.8rem;color:var(--ink-faint)">'+esc(e.cefrNote)+'</span></td>'+
+    '<td class="vex" style="color:var(--danger)">'+esc(e.example)+'</td>'+
+    '<td class="vex" style="color:var(--good)">'+esc(e.correction)+'</td></tr>'
+  )).join('');
+
+  const planRows = (a.tutorPlan||[]).map((p,i) => (
+    '<div class="plan-step"><span class="plan-num">'+(i+1)+'</span><div style="font-size:.95rem;color:var(--ink-soft)">'+esc(p)+'</div></div>'
+  )).join('');
+
+  $('report-body').innerHTML =
+    '<div class="pane overall-pane"><div class="pane-title">Overall CEFR rating <span class="badge">'+esc(a.overallLevel)+'</span></div>'+
+    '<p style="margin-top:0;color:var(--ink-soft)">'+esc(m.name||'')+' &middot; '+(m.wordCount||0)+' words'+
+    (m.targetWords ? ' (target '+m.targetWords+')' : '')+(m.timeLimit ? ' &middot; '+m.timeLimit+' min limit' : '')+'</p>'+
+    '<div style="margin:16px 0 8px"><div class="bar-wrap" style="height:20px;border-radius:10px"><div class="bar-fill" style="width:'+(a.overallScore||BAND_SCORE[a.overallLevel]||0)+'%;border-radius:10px"></div></div>'+
+    '<div class="scale">'+BANDS.map(b=>'<span class="step'+(b===a.overallLevel?' on':'')+'">'+b+'</span>').join('')+'</div></div>'+
+    (a.lengthNote ? '<p class="feedback-text" style="margin-top:14px">'+esc(a.lengthNote)+'</p>' : '')+'</div>'+
+
+    '<div class="pane"><div class="pane-title">Examiner feedback</div><p class="feedback-text" style="border-left:3px solid var(--gold)">'+esc(a.feedback)+'</p></div>'+
+
+    '<div class="pane"><div class="pane-title">Dimension analysis</div>'+dimRows+'</div>'+
+
+    '<div class="pane"><div class="pane-title">Strengths</div><ul class="blist">'+
+    (a.strengths||[]).map(s=>'<li style="border-left:3px solid var(--good);padding-left:10px">'+esc(s)+'</li>').join('')+'</ul></div>'+
+
+    '<div class="pane"><div class="pane-title">Priorities for improvement</div><ul class="blist">'+
+    (a.priorities||[]).map(s=>'<li style="border-left:3px solid var(--accent);padding-left:10px">'+esc(s)+'</li>').join('')+'</ul></div>'+
+
+    (errRows ? '<div class="pane"><div class="pane-title">Recurring error patterns</div><table class="etable"><thead><tr><th style="width:30%">Issue</th><th>From the response</th><th>Correction</th></tr></thead><tbody>'+errRows+'</tbody></table></div>' : '')+
+
+    '<div class="pane"><div class="pane-title">Tutor follow-up plan</div>'+planRows+
+    '<p class="up-hint" style="margin:14px 0 0">The Vocabulary and Grammar tabs hold the full lesson-ready upgrade tables that feed this plan.</p></div>';
+}
+
+/* -------- 3 · upgrades split screen -------- */
+let pinnedId = null;
+function renderUpgrades(){
+  const d = current.data, a = d.assessment, u = levelData();
+  $('up-from').textContent = a.overallLevel;
+  $('up-to').textContent = activeLevel;
+  $('orig-lv').textContent = a.overallLevel;
+  $('up-summary').textContent = u.summary || '';
+  $('orig-body').innerHTML = annotatedToHtml(u.originalAnnotated || current.essay);
+  $('upg-body').innerHTML  = annotatedToHtml(u.upgradedAnnotated || '');
+  pinnedId = null;
+  $('detail-card').classList.remove('show');
+  bindSegEvents($('orig-body'), $('upg-body'));
+  bindSegEvents($('upg-body'), $('orig-body'));
+  renderCefrRow('upg-cefr-row');
+}
+
+/* Shared CEFR button row used on Upgrades, Vocabulary and Grammar tabs.
+ * - levels below the default are greyed (you only upgrade up)
+ * - the active level is highlighted
+ * - generated levels are selectable instantly
+ * - teacher only: ungenerated levels >= default are "addable" (trigger gen)
+ *   student: ungenerated levels are greyed (cannot trigger generation) */
+function renderCefrRow(containerId){
+  const el = $(containerId);
+  if (!el || !current) return;
+  const def = current.data.defaultLevel;
+  const gen = generatedLevels();
+  el.innerHTML = '';
+  BTN_BANDS.forEach(b => {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'cefr-btn'; btn.textContent = b;
+    const isGen = gen.indexOf(b) >= 0;
+    const belowDefault = bandIdx(b) < bandIdx(def);
+    if (b === activeLevel){ btn.classList.add('active'); }
+    else if (isGen){ btn.classList.add('gen'); btn.addEventListener('click', () => switchLevel(b)); }
+    else if (belowDefault){ btn.disabled = true; }
+    else if (!IS_STUDENT){ btn.classList.add('addable'); btn.title = 'Generate an upgrade to ' + b; btn.addEventListener('click', () => triggerUpgrade(b)); }
+    else { btn.disabled = true; btn.title = 'Not yet generated by your teacher'; }
+    el.appendChild(btn);
+  });
+}
+function switchLevel(level){
+  if (!current.data.upgrades[level]) return;
+  activeLevel = level;
+  renderUpgrades();
+  renderVocabTable();
+  renderGrammarTable();
+  resetStudio();
+}
+async function triggerUpgrade(level){
+  if (upgradeBusy || IS_STUDENT) return;
+  upgradeBusy = true;
+  try {
+    loading(true, 'Upgrading to ' + level + '…', 'Claude is rewriting the original response at ' + level + ' and cataloguing the new vocabulary and grammar. About a minute.');
+    const out = await api({
+      action:'upgrade_level',
+      savedId: current.data.savedId || '',
+      essay: current.essay,
+      prompt: (current.meta && current.meta.prompt) || '',
+      originalLevel: current.data.assessment.overallLevel,
+      targetLevel: level
+    });
+    loading(false);
+    current.data.upgrades[level] = out.level;
+    activeLevel = level;
+    renderUpgrades(); renderVocabTable(); renderGrammarTable(); resetStudio();
+    if (out.saveWarning){ const n=$('vocab-note'); if(n){ n.className='tool-note err'; n.textContent='⚠ '+out.saveWarning; } }
+  } catch(err){
+    loading(false);
+    const n=$('vocab-note'); if(n){ n.className='tool-note err'; n.textContent='Upgrade to '+level+' failed: '+err.message; }
+    alert('Upgrade to ' + level + ' failed: ' + err.message);
+  }
+  upgradeBusy = false;
+}
+// [[V1]]text[[/V1]] → <span class="seg seg-v" data-id="V1">text</span>; strips orphan markers.
+function annotatedToHtml(text){
+  text = String(text||'');
+  let html = '', last = 0;
+  const re = /\[\[(V|G)(\d+)\]\]([\s\S]*?)\[\[\/\1\2\]\]/g;
+  let mt;
+  while ((mt = re.exec(text)) !== null){
+    html += esc(text.slice(last, mt.index));
+    const id = mt[1] + mt[2];
+    const cls = mt[1] === 'V' ? 'seg-v' : 'seg-g';
+    html += '<span class="seg '+cls+'" data-id="'+id+'" tabindex="0">'+esc(mt[3])+'</span>';
+    last = re.lastIndex;
+  }
+  html += esc(text.slice(last));
+  return html.replace(/\[\[\/?(?:V|G)\d+\]\]/g, '');   // any stray unpaired markers
+}
+function bindSegEvents(pane, otherPane){
+  pane.querySelectorAll('.seg').forEach(seg => {
+    seg.addEventListener('mouseenter', () => { if (!pinnedId) light(seg.dataset.id, otherPane, false); });
+    seg.addEventListener('mouseleave', () => { if (!pinnedId) unlightAll(); });
+    seg.addEventListener('click', () => {
+      if (pinnedId === seg.dataset.id){ pinnedId = null; unlightAll(); $('detail-card').classList.remove('show'); return; }
+      pinnedId = seg.dataset.id;
+      light(seg.dataset.id, otherPane, true);
+    });
+    seg.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); seg.click(); } });
+  });
+}
+function light(id, otherPane, pin){
+  unlightAll();
+  document.querySelectorAll('.seg[data-id="'+id+'"]').forEach(s => { s.classList.add('lit'); if (pin) s.classList.add('pinned'); });
+  const counterpart = otherPane.querySelector('.seg[data-id="'+id+'"]');
+  if (counterpart) counterpart.scrollIntoView({behavior:'smooth', block:'center'});
+  showDetail(id);
+}
+function unlightAll(){ document.querySelectorAll('.seg.lit,.seg.pinned').forEach(s => s.classList.remove('lit','pinned')); }
+function showDetail(id){
+  const card = $('detail-card');
+  let html = '';
+  if (id[0] === 'V'){
+    const v = vocabRows().find(x => x.id === id);
+    if (!v) return card.classList.remove('show');
+    html =
+      '<span class="dk">Vocabulary upgrade '+esc(id)+'</span>'+
+      '<div class="dpair"><span class="from">'+esc(v.original)+'</span><span class="lv-tag">'+esc(v.originalLevel)+'</span>'+
+      ' → <span class="to">'+esc(v.replacement)+'</span><span class="lv-tag up">'+esc(v.replacementLevel)+'</span></div>'+
+      '<div class="detail-grid">'+
+      '<div><b>Definition:</b> '+esc(v.definition)+'</div>'+
+      '<div><b>Part of speech:</b> '+esc(v.partOfSpeech)+'</div>'+
+      '<div><b>Collocations:</b> '+v.collocations.map(esc).join(' · ')+'</div>'+
+      '<div><b>Synonyms:</b> '+v.synonyms.map(esc).join(' · ')+'</div>'+
+      '</div><div class="dlink"><a onclick="jumpToRow(\'vocab\',\''+esc(id)+'\')">Full entry in the Vocabulary table →</a></div>';
+  } else {
+    const g = grammarRows().find(x => x.id === id);
+    if (!g) return card.classList.remove('show');
+    html =
+      '<span class="dk">Grammar upgrade '+esc(id)+' — '+esc(g.topic)+(g.subTopic?' · '+esc(g.subTopic):'')+'</span>'+
+      '<div class="dpair"><span class="from">'+esc(g.original)+'</span><span class="lv-tag">'+esc(g.originalLevel)+'</span></div>'+
+      '<div class="dpair">→ <span class="to">'+esc(g.replacement)+'</span><span class="lv-tag up">'+esc(g.replacementLevel)+'</span></div>'+
+      '<div class="dlink"><a onclick="jumpToRow(\'grammar\',\''+esc(id)+'\')">Improvement steps in the Grammar table →</a></div>';
+  }
+  card.innerHTML = html;
+  card.classList.add('show');
+}
+window.jumpToRow = function(screen, id){
+  showScreen(screen);
+  const row = document.getElementById('row-'+id);
+  if (row){
+    row.scrollIntoView({behavior:'smooth', block:'center'});
+    row.classList.add('flash');
+    setTimeout(() => row.classList.remove('flash'), 2400);
+  }
+};
+
+/* -------- 4 · vocab table -------- */
+function renderVocabTable(){
+  renderCefrRow('vocab-cefr-row');
+  const rows = vocabRows();
+  const showImg = !IS_STUDENT;   // students don't see the Illustration idea column
+  const head = '<thead><tr><th>#</th><th>Original<br>(level)</th><th>Replacement<br>(level)</th><th>Definition</th><th>Part of speech</th><th>Synonyms (B1·B2·C1)</th><th>Antonyms (B1·B2·C1)</th><th>Example sentences</th><th>Collocations</th>'+(showImg?'<th>Illustration idea</th>':'')+'</tr></thead>';
+  const cols = showImg ? 10 : 9;
+  const body = rows.map(v => (
+    '<tr id="row-'+esc(v.id)+'"><td><span class="gid v">'+esc(v.id)+'</span></td>'+
+    '<td><span class="word-strong">'+esc(v.original)+'</span><span class="lv-tag">'+esc(v.originalLevel)+'</span></td>'+
+    '<td><span class="word-strong" style="color:var(--accent)">'+esc(v.replacement)+'</span><span class="lv-tag up">'+esc(v.replacementLevel)+'</span></td>'+
+    '<td>'+esc(v.definition)+'</td><td>'+esc(v.partOfSpeech)+'</td>'+
+    '<td><ul class="mini-list">'+v.synonyms.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></td>'+
+    '<td><ul class="mini-list">'+v.antonyms.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></td>'+
+    '<td class="vex"><ul class="mini-list">'+v.examples.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></td>'+
+    '<td><ul class="mini-list">'+v.collocations.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></td>'+
+    (showImg?'<td style="font-style:italic;color:var(--ink-soft)">'+esc(v.imageDescription)+'</td>':'')+'</tr>'
+  )).join('');
+  $('vocab-table').innerHTML = head + '<tbody>' + (body || '<tr><td colspan="'+cols+'">No vocabulary upgrades at this level.</td></tr>') + '</tbody>';
+}
+
+/* -------- 5 · grammar table -------- */
+function renderGrammarTable(){
+  renderCefrRow('grammar-cefr-row');
+  const rows = grammarRows();
+  const head = '<thead><tr><th>#</th><th>Original sentence (level)</th><th>Upgraded sentence (level)</th><th>Grammar topic &amp; sub-topic</th><th>Recommended improvement steps</th></tr></thead>';
+  const body = rows.map(g => (
+    '<tr id="row-'+esc(g.id)+'"><td><span class="gid">'+esc(g.id)+'</span></td>'+
+    '<td class="vex">'+esc(g.original)+'<span class="lv-tag">'+esc(g.originalLevel)+'</span></td>'+
+    '<td class="vex" style="color:var(--accent)">'+esc(g.replacement)+'<span class="lv-tag up">'+esc(g.replacementLevel)+'</span></td>'+
+    '<td><b>'+esc(g.topic)+'</b>'+(g.subTopic ? '<br><span style="color:var(--ink-soft)">'+esc(g.subTopic)+'</span>' : '')+'</td>'+
+    '<td><ol class="mini-list" style="padding-left:18px">'+g.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></td></tr>'
+  )).join('');
+  $('grammar-table').innerHTML = head + '<tbody>' + (body || '<tr><td colspan="5">No grammar upgrades at this level.</td></tr>') + '</tbody>';
+}
+
+/* -------- export to Google Sheet & Blooket generation -------- */
+['vocab','grammar'].forEach(kind => {
+  $(kind+'-export-btn').addEventListener('click', () => exportTable(kind));
+  $(kind+'-blooket-btn').addEventListener('click', () => genBlooket(kind));
+});
+function toolNote(kind, cls, html){
+  const n = $(kind+'-note');
+  n.className = 'tool-note ' + cls;
+  n.innerHTML = html;
+}
+function tableData(kind){
+  return kind === 'vocab' ? vocabRows() : grammarRows();
+}
+async function exportTable(kind){
+  if (!current) return;
+  const rows = tableData(kind);
+  if (!rows.length) return toolNote(kind, 'err', 'There are no rows to export.');
+  const btn = $(kind+'-export-btn');
+  btn.disabled = true;
+  try {
+    loading(true, 'Creating Google Sheet…', 'Writing the ' + kind + ' upgrade table to a new spreadsheet in your Drive.');
+    const out = await api({ action:'export_table', kind:kind, name:(current.meta&&current.meta.name)||'Student', rows:rows });
+    loading(false);
+    toolNote(kind, 'ok', '✓ Exported ' + out.rows + ' rows → <a href="'+esc(out.url)+'" target="_blank" rel="noopener">'+esc(out.title)+'</a>');
+  } catch(err){
+    loading(false);
+    toolNote(kind, 'err', 'Export failed: ' + esc(err.message));
+  }
+  btn.disabled = false;
+}
+async function genBlooket(kind){
+  if (!current) return;
+  const items = tableData(kind);
+  if (!items.length) return toolNote(kind, 'err', 'There are no upgrade items to build questions from.');
+  const btn = $(kind+'-blooket-btn');
+  btn.disabled = true;
+  try {
+    loading(true, 'Writing 50 Blooket questions…',
+      'Claude is building ' + (kind==='vocab' ? 'vocabulary' : 'grammar') + ' MCQs themed to the essay prompt at the upgrade level. This can take a minute.');
+    const out = await api({
+      action:'blooket', kind:kind,
+      name:(current.meta&&current.meta.name)||'Student',
+      targetLevel: activeLevel,
+      promptText: (current.meta&&current.meta.prompt)||'',
+      items: items
+    });
+    loading(false);
+    toolNote(kind, 'ok', '✓ ' + out.count + ' questions ready → <a href="'+esc(out.url)+'" target="_blank" rel="noopener">'+esc(out.title)+'</a>' +
+      '<br><span style="color:var(--ink-faint);font-size:.82rem">Columns: Question Text · Answer Time Limit (20s) · Correct Answer · Incorrect Answers 1–3. Download as CSV from the Sheet to import into Blooket.</span>');
+  } catch(err){
+    loading(false);
+    toolNote(kind, 'err', 'Blooket generation failed: ' + esc(err.message));
+  }
+  btn.disabled = false;
+}
+
+/* -------- 6 · lesson studio -------- */
+const rp = { scenario:null, scenarioText:'', history:[], used:{}, busy:false };
+
+function studioPayload(){
+  const m = current.meta || {};
+  return {
+    name: m.name || 'the student',
+    targetLevel: activeLevel,
+    promptText: m.prompt || '',
+    essayGist: (current.essay || '').slice(0, 1200),
+    vocab: vocabRows(),
+    grammar: grammarRows()
+  };
+}
+function resetStudio(){
+  $('studio-name').textContent = (current.meta && current.meta.name) || 'this student';
+  $('studio-level').textContent = activeLevel;
+  if ($('plan-body')) $('plan-body').innerHTML = '';
+  if ($('plan-note')) $('plan-note').className = 'tool-note';
+  ['slides','podcast','song','video'].forEach(k => { const n = $('mat-'+k+'-note'); if (n) n.className = 'tool-note'; });
+  $('rp-note').className = 'tool-note';
+  rp.scenario = null; rp.scenarioText = ''; rp.history = []; rp.used = {}; rp.busy = false;
+  $('rp-stage').style.display = 'none';
+  $('rp-setup').style.display = '';
+  $('rp-chat').innerHTML = '';
+  $('rp-coach').style.display = 'none';
+}
+
+/* lesson plan */
+$('plan-btn').addEventListener('click', async () => {
+  const btn = $('plan-btn'); btn.disabled = true;
+  $('plan-note').className = 'tool-note';
+  try {
+    loading(true, 'Designing the session…', 'Building a themed 50-minute plan around the target language.');
+    const out = await api(Object.assign({ action:'lesson_plan' }, studioPayload()));
+    loading(false);
+    renderPlan(out.plan);
+  } catch(err){
+    loading(false);
+    const n = $('plan-note'); n.className='tool-note err'; n.textContent = 'Lesson plan failed: ' + err.message;
+  }
+  btn.disabled = false;
+});
+function renderPlan(p){
+  const stages = (p.stages||[]).map(s => (
+    '<div class="plan-stage"><div class="plan-min">'+(Number(s.minutes)||0)+' min<span class="pf">'+esc(s.format||'')+'</span></div>'+
+    '<div><h4>'+esc(s.name||'')+'</h4><div class="pdesc">'+esc(s.activity||'')+'</div>'+
+    '<div class="pmeta"><b>Materials:</b> '+esc(s.materials||'—')+' &middot; <b>Recycles:</b> '+esc(s.targets||'—')+'</div>'+
+    (s.teacherTip ? '<span class="ptip">💡 '+esc(s.teacherTip)+'</span>' : '')+'</div></div>'
+  )).join('');
+  $('plan-body').innerHTML =
+    '<div style="margin-top:16px"><h3 style="margin-bottom:2px">'+esc(p.title||'Lesson plan')+'</h3>'+
+    '<p class="up-hint" style="margin:0 0 10px"><b>Theme:</b> '+esc(p.theme||'')+' &middot; <b>Story thread:</b> '+esc(p.storyThread||'')+'</p>'+
+    '<p class="feedback-text" style="border-left:3px solid var(--gold)"><b>Objectives:</b> '+(p.objectives||[]).map(esc).join(' · ')+'</p>'+
+    stages+
+    '<p class="feedback-text" style="margin-top:14px"><b>Real-life transfer:</b> '+esc(p.realLifeTransfer||'')+'</p>'+
+    '<p class="feedback-text"><b>Exit ticket:</b> '+esc(p.exitTicket||'')+'</p>'+
+    '<p class="feedback-text" style="border-left:3px solid var(--good)"><b>Micro-homework:</b> '+esc(p.homework||'')+'</p>'+
+    '<button class="ghost" type="button" onclick="printScreen(\'screen-studio\')">🖨 Print plan</button></div>';
+}
+
+/* materials */
+document.querySelectorAll('[data-mat]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const kind = btn.dataset.mat;
+    const note = $('mat-'+kind+'-note');
+    note.className = 'tool-note';
+    btn.disabled = true;
+    const labels = { slides:['Building the slide deck…','Writing 12–16 slides with tutor script in the notes.'],
+                     podcast:['Writing the podcast script…','Two teen hosts, production cues, listener challenge.'],
+                     song:['Writing the song pack…','Chorus drills the vocab, verses showcase the grammar.'],
+                     video:['Writing the video storyboard…','Shot-by-shot plan with target language in the lines.'] };
+    try {
+      loading(true, labels[kind][0], labels[kind][1]);
+      const out = await api(Object.assign({ action:'material', kind:kind }, studioPayload()));
+      loading(false);
+      note.className = 'tool-note ok';
+      note.innerHTML = '✓ Ready → <a href="'+esc(out.url)+'" target="_blank" rel="noopener">'+esc(out.title)+'</a>';
+    } catch(err){
+      loading(false);
+      note.className = 'tool-note err';
+      note.textContent = 'Generation failed: ' + err.message;
+    }
+    btn.disabled = false;
+  });
+});
+
+/* role-play arcade */
+$('rp-start').addEventListener('click', startRoleplay);
+$('rp-new').addEventListener('click', startRoleplay);
+$('rp-send').addEventListener('click', sendRoleplay);
+$('rp-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendRoleplay(); }
+});
+async function startRoleplay(){
+  if (rp.busy) return;
+  rp.busy = true;
+  $('rp-note').className = 'tool-note';
+  try {
+    loading(true, 'Setting the scene…', 'Claude is building a real-life scenario from the essay topic.');
+    const out = await api(Object.assign({ action:'roleplay', start:true }, studioPayload()));
+    loading(false);
+    rp.scenario = out.scenario || {};
+    rp.scenarioText = 'SCENARIO: ' + JSON.stringify(rp.scenario);
+    rp.history = [{ role:'assistant', content: out.reply }];
+    rp.used = {};
+    $('rp-setup').style.display = 'none';
+    $('rp-stage').style.display = '';
+    const sc = rp.scenario;
+    $('rp-scenario').innerHTML =
+      '<b>'+esc(sc.title||'Role-play')+'</b><br>'+esc(sc.setting||'')+
+      '<br><b>Claude plays:</b> '+esc(sc.yourCharacter||'a character')+
+      ' &middot; <b>Student plays:</b> '+esc(sc.studentRole||'herself')+
+      '<br><b>Mission:</b> '+esc(sc.mission||'')+'';
+    renderChips();
+    $('rp-chat').innerHTML = '';
+    $('rp-coach').style.display = 'none';
+    addMsg('them', out.reply, sc.yourCharacter || 'Character');
+  } catch(err){
+    loading(false);
+    const n = $('rp-note'); n.className = 'tool-note err'; n.textContent = 'Could not start: ' + err.message;
+  }
+  rp.busy = false;
+}
+async function sendRoleplay(){
+  if (rp.busy) return;
+  const box = $('rp-input');
+  const text = box.value.trim();
+  if (!text) return;
+  rp.busy = true;
+  box.value = '';
+  addMsg('me', text, 'Student');
+  rp.history.push({ role:'user', content:text });
+  markUsedTargets(text);
+  const typing = addMsg('them', '…', rp.scenario.yourCharacter || 'Character');
+  typing.classList.add('rp-typing');
+  try {
+    const out = await api(Object.assign({
+      action:'roleplay', scenario: rp.scenarioText, history: rp.history
+    }, studioPayload()));
+    typing.remove();
+    addMsg('them', out.reply, rp.scenario.yourCharacter || 'Character');
+    rp.history.push({ role:'assistant', content: out.reply });
+    if (out.coachTip){
+      const c = $('rp-coach');
+      c.style.display = '';
+      c.textContent = '🧭 Coach: ' + out.coachTip;
+    }
+  } catch(err){
+    typing.remove();
+    const n = $('rp-note'); n.className = 'tool-note err'; n.textContent = 'Turn failed: ' + err.message;
+    rp.history.pop();   // let the student resend
+  }
+  rp.busy = false;
+}
+function addMsg(side, text, who){
+  const chat = $('rp-chat');
+  const div = document.createElement('div');
+  div.className = 'rp-msg ' + side;
+  div.innerHTML = '<span class="who">'+esc(who)+'</span>' + esc(text);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+function renderChips(){
+  const chips = vocabRows().map(v =>
+    '<span class="rp-chip'+(rp.used[v.id]?' used':'')+'" id="chip-'+esc(v.id)+'">'+esc(v.replacement)+'</span>'
+  ).join('');
+  $('rp-chips').innerHTML = chips;
+  updateRpProgress();
+}
+function markUsedTargets(text){
+  const low = ' ' + text.toLowerCase() + ' ';
+  vocabRows().forEach(v => {
+    if (rp.used[v.id]) return;
+    const phrase = String(v.replacement||'').toLowerCase().trim();
+    if (!phrase) return;
+    // exact phrase, or root match on the head word (handles -s/-ed/-ing inflection)
+    let hit = low.indexOf(phrase) >= 0;
+    if (!hit){
+      const head = phrase.split(/\s+/)[0].replace(/(ed|ing|es|s)$/,'');
+      if (head.length >= 4){
+        hit = new RegExp('\\b' + head.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\w*', 'i').test(text);
+      }
+    }
+    if (hit){
+      rp.used[v.id] = true;
+      const chip = $('chip-'+v.id);
+      if (chip) chip.classList.add('used');
+    }
+  });
+  updateRpProgress();
+}
+function updateRpProgress(){
+  const total = vocabRows().length;
+  const used = Object.keys(rp.used).length;
+  $('rp-progress').textContent = total ? ('Target words used: ' + used + ' / ' + total + (used===total && total>0 ? ' — full house! 🎉' : '')) : '';
+}
+
+/* =================================================================
+ * INTERACTIVE GAME ENGINE
+ * Game language is pinned to the WRITING level; only targets stretch.
+ * ================================================================= */
+const G = { pack:null, idx:0, score:0, streak:0, scorable:0, done:0, correct:0, check:null, answered:false, mode:'play' };
+
+$('vocab-play-btn').addEventListener('click', () => launchGame('vocab'));
+$('grammar-play-btn').addEventListener('click', () => launchGame('grammar'));
+$('game-close').addEventListener('click', closeGame);
+$('game-action').addEventListener('click', () => { if (G.mode === 'done') closeGame(); else gameAction(); });
+
+function norm(s){
+  return String(s||'').toLowerCase().replace(/[’']/g,"'").replace(/[.,!?;:]+$/,'').replace(/\s+/g,' ').trim();
+}
+function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+async function launchGame(kind){
+  if (!current) return;
+  const note = $(kind+'-note');
+  const items = kind==='vocab' ? vocabRows() : grammarRows();
+  if (!items.length){ note.className='tool-note err'; note.textContent='No items to build a game from.'; return; }
+  note.className='tool-note';
+  try {
+    loading(true, 'Building your game…', 'Creating varied, themed challenges at your level. One minute or so.');
+    const out = await api({
+      action:'game_pack', kind:kind,
+      writingLevel: current.data.assessment.overallLevel,   // language ceiling = WRITING level
+      targetLevel: activeLevel,
+      name: (current.meta&&current.meta.name)||'Student',
+      promptText: (current.meta&&current.meta.prompt)||'',
+      items: items
+    });
+    loading(false);
+    startGame(out.pack);
+  } catch(err){
+    loading(false);
+    note.className='tool-note err'; note.textContent='Could not build the game: ' + err.message;
+  }
+}
+
+function startGame(pack){
+  G.pack = pack; G.idx = 0; G.score = 0; G.streak = 0; G.answered = false; G.mode = 'play'; G.correct = 0;
+  G.scorable = pack.rounds.filter(r => r.type!=='teach').length;
+  G.done = 0;
+  $('game-title').textContent = pack.kind==='vocab' ? 'Vocabulary Quest' : 'Grammar Quest';
+  $('game-theme').textContent = 'Pitched at ' + pack.level + ' · target items at ' + pack.targetLevel;
+  $('game-overlay').classList.remove('hidden');
+  $('game-score').textContent = '0';
+  $('game-streak').textContent = '';
+  renderRound();
+}
+function closeGame(){ $('game-overlay').classList.add('hidden'); G.pack=null; }
+
+function setAction(label, disabled){
+  const b = $('game-action');
+  b.textContent = label;
+  b.disabled = !!disabled;
+  b.style.display = label ? '' : 'none';
+}
+function feedback(cls, html){
+  const f = $('game-feedback');
+  f.className = 'game-feedback ' + (cls||'');
+  f.innerHTML = html || '';
+}
+
+function renderRound(){
+  G.answered = false; G.check = null;
+  feedback('', '');
+  const rounds = G.pack.rounds;
+  if (G.idx >= rounds.length) return renderFinal();
+  const r = rounds[G.idx];
+  const stepNum = G.idx + 1;
+  $('game-step').textContent = 'Round ' + stepNum + ' / ' + rounds.length;
+  $('game-prog-fill').style.width = Math.round(G.idx / rounds.length * 100) + '%';
+  const body = $('game-body');
+  body.innerHTML = '';
+
+  const R = {
+    sort:renderSort, gapfill:renderGapfill, oddoneout:renderOdd, match:renderMatch,
+    unscramble:renderUnscramble, teach:renderTeach, build:renderBuild,
+    transform:renderTransform, spoterror:renderSpot, order:renderOrder
+  };
+  (R[r.type] || renderUnknown)(r, body);
+  body.scrollTop = 0;
+}
+
+function gameAction(){
+  const r = G.pack.rounds[G.idx];
+  if (r.type === 'teach'){ G.idx++; renderRound(); return; }
+  if (!G.answered){
+    if (!G.check) return;
+    const res = G.check();
+    if (res == null) return;               // not ready (e.g. nothing selected)
+    if (res.retry){                        // wrong but a second chance is allowed
+      feedback('bad', '✗ ' + (res.msg || 'Not quite — try once more.'));
+      return;
+    }
+    G.answered = true;
+    G.done++;
+    if (res.correct){
+      G.correct++;
+      G.streak++;
+      const pts = 10 + Math.min(G.streak-1, 5) * 2;
+      G.score += pts;
+      feedback('good', '✓ ' + (res.msg || 'Correct!') + ' <span style="color:var(--ink-faint);font-weight:400">+' + pts + ' pts</span>' + (res.explain ? '<br><span style="font-weight:400;color:var(--ink-soft)">'+res.explain+'</span>' : ''));
+    } else {
+      G.streak = 0;
+      feedback('bad', '✗ ' + (res.msg || 'Not quite.') + (res.explain ? '<br><span style="font-weight:400;color:var(--ink-soft)">'+res.explain+'</span>' : ''));
+    }
+    $('game-score').textContent = G.score;
+    $('game-streak').textContent = G.streak >= 2 ? ('🔥 ' + G.streak + ' streak') : '';
+    setAction(G.idx >= G.pack.rounds.length-1 ? 'See results' : 'Next →');
+  } else {
+    G.idx++;
+    renderRound();
+  }
+}
+
+/* ---- VOCAB renderers ---- */
+function renderSort(r, body){
+  body.innerHTML =
+    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+
+    (r.word ? '<div class="g-target">'+esc(r.word)+'</div>' : '')+
+    '<div class="g-chips" id="g-pool"></div>'+
+    '<div class="g-buckets">'+
+      '<div class="g-bucket syn"><h5>Same meaning</h5><div class="drop" id="bk-synonym"></div></div>'+
+      '<div class="g-bucket ant"><h5>Opposite meaning</h5><div class="drop" id="bk-antonym"></div></div>'+
+    '</div>';
+  const pool = $('g-pool');
+  const assign = {};
+  shuffle(r.items).forEach((it, i) => {
+    const c = document.createElement('span');
+    c.className = 'g-chip'; c.textContent = it.text; c.dataset.i = i; c.dataset.bucket = it.bucket;
+    c.addEventListener('click', () => {
+      if (G.answered) return;
+      const cur = assign[i];
+      const next = cur==='synonym' ? 'antonym' : (cur==='antonym' ? null : 'synonym');
+      assign[i] = next;
+      if (next) $('bk-'+next).appendChild(c); else pool.appendChild(c);
+      c.classList.toggle('sel', !!next);
+    });
+    pool.appendChild(c);
+  });
+  feedback('', 'Tap a word to send it to a bucket. Tap again to switch.');
+  setAction('Check');
+  G.check = () => {
+    const chips = body.querySelectorAll('.g-chip');
+    let allAssigned = true, right = 0; const wrong = [];
+    chips.forEach(c => { if (!assign[c.dataset.i]) allAssigned = false; });
+    if (!allAssigned){ feedback('bad', 'Put every word in a bucket first.'); return null; }
+    chips.forEach(c => {
+      const ok = assign[c.dataset.i] === c.dataset.bucket;
+      c.classList.remove('sel'); c.classList.add(ok?'correct':'wrong','disabled');
+      if (ok) right++;
+      else wrong.push('“'+esc(c.textContent)+'” is a '+(c.dataset.bucket==='synonym'?'synonym (same meaning)':'antonym (opposite meaning)'));
+    });
+    return { correct: right===chips.length, msg: right+' / '+chips.length+' sorted correctly',
+             explain: wrong.length ? 'Correct: '+wrong.join('; ')+'.' : '' };
+  };
+}
+
+function renderGapfill(r, body){
+  const parts = r.sentence.split('___');
+  body.innerHTML =
+    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+
+    '<div class="g-sentence">'+esc(parts[0]||'')+'<span class="g-blank">?</span>'+esc(parts[1]||'')+'</div>'+
+    '<input class="g-input" id="g-typed" placeholder="Type the word…" autocomplete="off" autocapitalize="off">'+
+    '<div class="g-hint" id="g-extra-hint">'+(r.hint ? '💡 '+esc(r.hint) : '')+'</div>';
+  const inp = $('g-typed'); inp.focus();
+  inp.addEventListener('keydown', e => { if (e.key==='Enter'){ e.preventDefault(); gameAction(); } });
+  setAction('Check');
+  let attempts = 0;
+  G.check = () => {
+    const v = norm(inp.value);
+    if (!v){ feedback('bad','Type your answer first.'); return null; }
+    const ok = r.accept.some(a => norm(a)===v);
+    if (ok) return { correct:true, msg:'Spot on!' };
+    attempts++;
+    if (attempts === 1){
+      // one more chance, with an extra letter/length clue
+      const w = String(r.answer||'');
+      const first = w.charAt(0);
+      const extra = first ? ('It begins with “' + first.toUpperCase() + '” and has ' + w.replace(/\s/g,'').length + ' letters.') : 'Look at the hint again.';
+      $('g-extra-hint').innerHTML = '💡 ' + esc(r.hint||'') + '<br>🔎 ' + esc(extra);
+      inp.value = ''; inp.focus();
+      return { retry:true, msg:'Not quite — one more try.' };
+    }
+    inp.classList.add('wrong');
+    return { correct:false, msg: 'The word was “'+esc(r.answer)+'”.' };
+  };
+}
+
+function renderOdd(r, body){
+  body.innerHTML = '<div class="g-instruction">'+esc(r.instruction)+'</div><div class="g-chips" id="g-opts"></div>';
+  let sel = -1;
+  const wrap = $('g-opts');
+  r.options.forEach((o,i) => {
+    const c = document.createElement('span');
+    c.className='g-chip'; c.textContent=o;
+    c.addEventListener('click', () => {
+      if (G.answered) return;
+      sel = i;
+      wrap.querySelectorAll('.g-chip').forEach(x=>x.classList.remove('sel'));
+      c.classList.add('sel');
+    });
+    wrap.appendChild(c);
+  });
+  setAction('Check');
+  G.check = () => {
+    if (sel < 0){ feedback('bad','Tap a word first.'); return null; }
+    const chips = wrap.querySelectorAll('.g-chip');
+    chips.forEach((c,i)=>{ c.classList.add('disabled'); if (i===r.answerIndex) c.classList.add('correct'); else if (i===sel) c.classList.add('wrong'); });
+    return { correct: sel===r.answerIndex, msg: sel===r.answerIndex?'Yes!':'The odd one was “'+esc(r.options[r.answerIndex])+'”.', explain:r.explain };
+  };
+}
+
+function renderMatch(r, body){
+  body.innerHTML =
+    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+
+    '<div class="g-match"><div class="g-col" id="g-left"></div><div class="g-col" id="g-right"></div></div>'+
+    '<div style="margin-top:14px"><button class="ghost" type="button" id="g-match-reset">↺ Reset matches</button></div>';
+  const COLORS = ['#b08d3e','#9a3412','#3f6212','#1d4ed8','#7c3aed'];
+  const lefts = r.pairs.map((p,i)=>({t:p.left, key:i}));
+  const rights = shuffle(r.pairs.map((p,i)=>({t:p.right, key:i})));
+  let selLeft = null, pairCount = 0;
+  const made = {};   // leftKey -> rightKey
+
+  function build(){
+    selLeft = null; pairCount = 0;
+    for (const k in made) delete made[k];
+    const L = $('g-left'), Rt = $('g-right');
+    L.innerHTML = ''; Rt.innerHTML = '';
+    lefts.forEach(o => L.appendChild(mkItem(o,'left')));
+    rights.forEach(o => Rt.appendChild(mkItem(o,'right')));
+    feedback('', 'Tap a word on the left, then its match on the right.');
+  }
+  function mkItem(obj, side){
+    const d = document.createElement('div');
+    d.className='g-mitem'; d.textContent=obj.t; d.dataset.key=obj.key; d.dataset.side=side;
+    d.addEventListener('click', () => {
+      if (G.answered) return;
+      if (side==='left'){
+        if (made[obj.key]!=null) return;
+        $('g-left').querySelectorAll('.g-mitem').forEach(x=>x.classList.remove('sel'));
+        selLeft = d; d.classList.add('sel');
+      } else if (selLeft){
+        const lk = selLeft.dataset.key;
+        if (made[lk]!=null) return;
+        // prevent re-using a right item already paired
+        if (Object.values(made).indexOf(obj.key) >= 0) return;
+        made[lk] = obj.key;
+        const col = COLORS[pairCount % COLORS.length]; pairCount++;
+        [selLeft, d].forEach(el=>{ el.classList.remove('sel'); el.classList.add('paired'); el.style.borderColor=col;
+          el.insertAdjacentHTML('afterbegin','<span class="g-mbadge" style="background:'+col+'">'+pairCount+'</span>'); });
+        selLeft.style.pointerEvents='none'; d.style.pointerEvents='none';
+        selLeft = null;
+      }
+    });
+    return d;
+  }
+  build();
+  $('g-match-reset').addEventListener('click', () => { if (!G.answered) build(); });
+  setAction('Check');
+  G.check = () => {
+    if (Object.keys(made).length < r.pairs.length){ feedback('bad','Match every pair first.'); return null; }
+    let right=0; const wrong=[];
+    r.pairs.forEach((p,i)=>{ if (made[i]===i) right++; else wrong.push('“'+esc(p.left)+'” → “'+esc(p.right)+'”'); });
+    return { correct: right===r.pairs.length, msg: right+' / '+r.pairs.length+' matched correctly',
+             explain: wrong.length ? 'Correct pairs: '+wrong.join('; ')+'.' : '' };
+  };
+}
+
+function renderUnscramble(r, body){
+  const letters = shuffle(r.answer.replace(/\s+/g,'').split(''));
+  body.innerHTML =
+    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+
+    (r.hint?'<div class="g-hint" style="margin:0 0 14px">💡 '+esc(r.hint)+'</div>':'')+
+    '<div class="g-answer" id="g-built"></div><div class="g-bank" id="g-letters"></div>';
+  const order = [];           // indices into `letters`, in the order chosen
+  const ans = $('g-built'), bank = $('g-letters');
+  function redraw(){
+    ans.innerHTML = '';
+    order.forEach((li, pos) => {
+      const t = document.createElement('span'); t.className='g-tile placed'; t.textContent = letters[li];
+      t.addEventListener('click', () => { if (G.answered) return; order.splice(pos,1); redraw(); reBank(); });
+      ans.appendChild(t);
+    });
+  }
+  function reBank(){
+    bank.innerHTML = '';
+    letters.forEach((ch, i) => {
+      const used = order.includes(i);
+      const t = document.createElement('span'); t.className = 'g-tile' + (used?' used':''); t.textContent = ch;
+      t.addEventListener('click', () => { if (G.answered || used) return; order.push(i); redraw(); reBank(); });
+      bank.appendChild(t);
+    });
+  }
+  reBank();
+  setAction('Check');
+  G.check = () => {
+    if (!order.length){ feedback('bad','Build the word first.'); return null; }
+    const guess = norm(order.map(i=>letters[i]).join(''));
+    const ok = r.accept.some(a => norm(a.replace(/\s+/g,''))===guess);
+    return { correct:ok, msg: ok?'Unscrambled!':'It spelled “'+esc(r.answer)+'”.' };
+  };
+}
+
+/* ---- GRAMMAR renderers ---- */
+function renderTeach(r, body){
+  const ex = (r.examples||[]).map(e=>'<div class="gt-ex">• '+esc(e)+'</div>').join('');
+  body.innerHTML =
+    '<div class="g-teach"><div class="gt-topic">'+esc(r.topic)+'</div>'+
+    (r.subTopic?'<div class="gt-sub">'+esc(r.subTopic)+'</div>':'')+
+    (r.concept?'<div class="gt-k">The idea</div><p>'+esc(r.concept)+'</p>':'')+
+    (r.form?'<div class="gt-k">The pattern</div><div class="gt-form">'+esc(r.form)+'</div>':'')+
+    (r.why?'<div class="gt-k">When &amp; why</div><p>'+esc(r.why)+'</p>':'')+
+    (ex?'<div class="gt-k">Examples</div>'+ex:'')+
+    ((r.commonError && (r.commonError.wrong||r.commonError.right))?
+      '<div class="gt-k">Watch out</div><div class="gt-err"><div class="gt-wrong">✗ '+esc(r.commonError.wrong)+'</div><div class="gt-right">✓ '+esc(r.commonError.right)+'</div></div>':'')+
+    '</div>';
+  feedback('', 'Read the idea, then put it into play.');
+  setAction('Got it — let’s play →');
+}
+
+function renderBuild(r, body){
+  body.innerHTML = '<div class="g-instruction">'+esc(r.instruction)+'</div><div class="g-answer" id="g-built"></div><div class="g-bank" id="g-bank"></div>';
+  const placed=[]; const order=[];
+  const tiles = shuffle(r.tiles.map((t,i)=>({t:t, i:i})));
+  function redraw(){
+    const ans=$('g-built'); ans.innerHTML='';
+    placed.forEach((obj,pos)=>{ const t=document.createElement('span'); t.className='g-tile placed'; t.textContent=obj.t;
+      t.addEventListener('click',()=>{ if(G.answered)return; placed.splice(pos,1); redraw(); reBank(); }); ans.appendChild(t); });
+  }
+  function reBank(){
+    const bank=$('g-bank'); bank.innerHTML='';
+    tiles.forEach(obj=>{ const used=placed.includes(obj); const t=document.createElement('span'); t.className='g-tile'+(used?' used':''); t.textContent=obj.t;
+      t.addEventListener('click',()=>{ if(G.answered||used)return; placed.push(obj); redraw(); reBank(); }); bank.appendChild(t); });
+  }
+  reBank();
+  setAction('Check');
+  G.check = () => {
+    if (!placed.length){ feedback('bad','Build the sentence first.'); return null; }
+    const guess = norm(placed.map(o=>o.t).join(' '));
+    const ok = r.accept.some(a=>norm(a)===guess);
+    return { correct:ok, msg: ok?'Perfectly built!':'One correct version: “'+esc(r.answer)+'”.' };
+  };
+}
+
+function renderTransform(r, body){
+  body.innerHTML =
+    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+
+    '<div class="g-sentence">'+esc(r.given)+'</div>'+
+    '<input class="g-input" id="g-typed" placeholder="Write your new sentence…" autocomplete="off">'+
+    (r.hint?'<div class="g-hint">💡 '+esc(r.hint)+'</div>':'');
+  const inp=$('g-typed'); inp.focus();
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); gameAction(); }});
+  setAction('Check');
+  G.check = () => {
+    const v=norm(inp.value);
+    if(!v){ feedback('bad','Write your sentence first.'); return null; }
+    const ok=r.accept.some(a=>norm(a)===v);
+    return { correct:ok, msg: ok?'Great transformation!':'A model answer: “'+esc(r.answer)+'”.' };
+  };
+}
+
+function renderSpot(r, body){
+  body.innerHTML = '<div class="g-instruction">'+esc(r.instruction)+'</div><div class="g-chips" id="g-tokens" style="line-height:2.4"></div>';
+  let sel = -1; const wrap = $('g-tokens');
+  r.tokens.forEach((tk,i) => {
+    const c = document.createElement('span');
+    c.className = 'g-chip'; c.textContent = tk; c.dataset.i = i;
+    c.style.padding = '6px 11px';
+    c.addEventListener('click', () => {
+      if (G.answered) return;
+      sel = i;
+      wrap.querySelectorAll('.g-chip').forEach(x => x.classList.remove('sel'));
+      c.classList.add('sel');
+    });
+    wrap.appendChild(c);
+  });
+  feedback('', 'Tap the word you think is wrong.');
+  setAction('Check');
+  G.check = () => {
+    if (sel < 0){ feedback('bad','Tap a word first.'); return null; }
+    const chips = wrap.querySelectorAll('.g-chip');
+    chips.forEach((c,i) => { c.classList.add('disabled'); c.classList.remove('sel');
+      if (i===r.errorIndex) c.classList.add('correct'); else if (i===sel) c.classList.add('wrong'); });
+    const ok = sel === r.errorIndex;
+    return { correct:ok, msg: ok?'Good eye!':'The wrong word was “'+esc(r.tokens[r.errorIndex])+'”.',
+             explain: (r.fix?'Correct form: “'+esc(r.fix)+'”. ':'')+esc(r.explain||'') };
+  };
+}
+
+function renderOrder(r, body){
+  body.innerHTML = '<div class="g-instruction">'+esc(r.instruction)+'</div><div class="g-answer" id="g-built"></div><div class="g-bank" id="g-bank"></div>';
+  const correct=r.chunks; const placed=[];
+  const tiles=shuffle(correct.map((c,i)=>({t:c,i:i})));
+  function redraw(){ const ans=$('g-built'); ans.innerHTML='';
+    placed.forEach((obj,pos)=>{ const t=document.createElement('span'); t.className='g-tile placed'; t.textContent=obj.t;
+      t.addEventListener('click',()=>{ if(G.answered)return; placed.splice(pos,1); redraw(); reBank(); }); ans.appendChild(t); }); }
+  function reBank(){ const bank=$('g-bank'); bank.innerHTML='';
+    tiles.forEach(obj=>{ const used=placed.includes(obj); const t=document.createElement('span'); t.className='g-tile'+(used?' used':''); t.textContent=obj.t;
+      t.addEventListener('click',()=>{ if(G.answered||used)return; placed.push(obj); redraw(); reBank(); }); bank.appendChild(t); }); }
+  reBank();
+  setAction('Check');
+  G.check = () => {
+    if (placed.length<correct.length){ feedback('bad','Use all the parts first.'); return null; }
+    const ok = placed.every((o,i)=>o.i===i);
+    return { correct:ok, msg: ok?'Perfect order!':'Correct order: “'+esc(correct.join(' '))+'”.' };
+  };
+}
+
+function renderUnknown(r, body){ body.innerHTML='<div class="g-instruction">This round could not be displayed.</div>'; setAction('Next →'); G.check=()=>({correct:false,msg:''}); }
+
+function renderFinal(){
+  $('game-step').textContent = 'Complete';
+  $('game-prog-fill').style.width = '100%';
+  const total = G.scorable;
+  const correct = G.correct;
+  const pct = total ? Math.round(correct / total * 100) : 0;
+  const stars = pct>=90?'★★★':pct>=60?'★★☆':pct>=30?'★☆☆':'☆☆☆';
+  const msg = pct>=90?'Outstanding — you owned this set!'
+            : pct>=60?'Strong work. A couple more plays and it’s locked in.'
+            : 'Good effort — replay to push your score higher.';
+  $('game-body').innerHTML =
+    '<div class="g-final"><div class="gf-big">'+G.score+' pts</div>'+
+    '<div class="gf-stars" style="color:var(--gold)">'+stars+'</div>'+
+    '<div class="gf-msg"><b>'+correct+' / '+total+'</b> correct ('+pct+'%)</div>'+
+    '<div class="gf-msg">'+msg+'</div>'+
+    '<div class="tile-launch"><button class="ghost" type="button" id="g-replay">↻ Play again</button>'+
+    '<button class="ghost" type="button" id="g-newpack">✨ Fresh questions</button></div></div>';
+  feedback('', '');
+  G.mode = 'done';           // the action button now closes the game
+  setAction('Done');
+  $('g-replay').addEventListener('click', () => startGame(G.pack));
+  $('g-newpack').addEventListener('click', () => { const k = G.pack.kind; closeGame(); launchGame(k); });
+}
+
+/* ---------------- startup ---------------- */
+configureRole();
+
+})();
+</script>
+</body>
+</html>
