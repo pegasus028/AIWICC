@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SWEP Essay Marker — CEFR Assessment &amp; Upgrade Studio</title>
+<title>AI Writing Coach Console &amp; Upgrade Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
@@ -309,10 +309,11 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
 <div class="container">
   <div class="topbar">
     <div>
-      <div class="brand-sub">Satriwithaya School &middot; English Program</div>
+      <div class="brand-sub" id="brand-sub">Satriwithaya School &middot; English Program</div>
       <h1>Essay Marker</h1>
       <p class="lede">Paste a prompt and a student response. Claude assesses against CEFR criteria, rewrites the essay one level higher, and catalogues every vocabulary and grammar upgrade for follow-up lessons.</p>
     </div>
+    <button class="ghost" type="button" id="logout-btn" style="display:none">⎋ Logout</button>
   </div>
 
   <nav class="tabs" id="tabs">
@@ -530,6 +531,7 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
       <div class="pane">
         <div class="pane-title">Role-play arcade <span style="font-size:.78rem;font-weight:400;color:var(--ink-faint)">immersive practice, right here</span></div>
         <p class="up-hint" style="margin:0 0 14px">Claude builds a real-life scenario from the essay topic and plays a character. The student chats in role and tries to light up every target word below. A coach whispers one tip per turn.</p>
+        <div class="cefr-bar"><span class="cefr-label">Scenario level:</span><div class="cefr-row" id="rp-cefr-row"></div></div>
         <div id="rp-setup">
           <button class="main" type="button" id="rp-start" style="margin-top:0">🎭 Start a role-play</button>
         </div>
@@ -695,8 +697,20 @@ function configureRole(){
   const h1 = document.querySelector('.topbar h1'); if (h1) h1.textContent = 'Writing Improvement Coach';
   const lede = document.querySelector('.topbar .lede');
   if (lede) lede.textContent = 'Log in with your Respondent\u2019s ID to see your report, your upgraded writing, and to practise with your AI coach.';
+  const eyebrow = $('brand-sub'); if (eyebrow) eyebrow.textContent = 'Please contact T.Chris for more information (Line ID: pegasus028)';
+  const lo = $('logout-btn'); if (lo){ lo.style.display = ''; lo.addEventListener('click', studentLogout); }
   // Show the login screen first
   showScreen('login');
+}
+function studentLogout(){
+  current = null; activeLevel = null;
+  $('login-id').value = '';
+  $('login-err').classList.remove('show');
+  // re-lock the content tabs until the next successful login
+  tabs.forEach(t => { if (t.dataset.screen!=='login') t.disabled = true; });
+  $('vcount').style.display = $('gcount').style.display = 'none';
+  showScreen('login');
+  $('login-id').focus();
 }
 if (IS_STUDENT){
   $('login-btn').addEventListener('click', studentLogin);
@@ -944,10 +958,11 @@ function renderReport(){
     '<div class="pane"><div class="pane-title">Priorities for improvement</div><ul class="blist">'+
     (a.priorities||[]).map(s=>'<li style="border-left:3px solid var(--accent);padding-left:10px">'+esc(s)+'</li>').join('')+'</ul></div>'+
 
-    (errRows ? '<div class="pane"><div class="pane-title">Recurring error patterns</div><table class="etable"><thead><tr><th style="width:30%">Issue</th><th>From the response</th><th>Correction</th></tr></thead><tbody>'+errRows+'</tbody></table></div>' : '')+
+    (errRows ? '<div class="pane"><div class="pane-title">'+(IS_STUDENT?'Recurring patterns':'Recurring error patterns')+'</div><table class="etable"><thead><tr><th style="width:30%">'+(IS_STUDENT?'Underperforming area':'Issue')+'</th><th>'+(IS_STUDENT?'Current form in response':'From the response')+'</th><th>'+(IS_STUDENT?'Upgraded form':'Correction')+'</th></tr></thead><tbody>'+errRows+'</tbody></table></div>' : '')+
 
+    (IS_STUDENT ? '' :
     '<div class="pane"><div class="pane-title">Tutor follow-up plan</div>'+planRows+
-    '<p class="up-hint" style="margin:14px 0 0">The Vocabulary and Grammar tabs hold the full lesson-ready upgrade tables that feed this plan.</p></div>';
+    '<p class="up-hint" style="margin:14px 0 0">The Vocabulary and Grammar tabs hold the full lesson-ready upgrade tables that feed this plan.</p></div>');
 }
 
 /* -------- 3 · upgrades split screen -------- */
@@ -1217,6 +1232,7 @@ function resetStudio(){
   $('rp-setup').style.display = '';
   $('rp-chat').innerHTML = '';
   $('rp-coach').style.display = 'none';
+  renderCefrRow('rp-cefr-row');
 }
 
 /* lesson plan */
@@ -1553,9 +1569,44 @@ function renderSort(r, body){
 
 function renderGapfill(r, body){
   const parts = r.sentence.split('___');
+  const sentenceHtml = '<div class="g-sentence">'+esc(parts[0]||'')+'<span class="g-blank">?</span>'+esc(parts[1]||'')+'</div>';
+
+  // Multiple-choice mode (4 single-select options) when the round supplies options.
+  if (Array.isArray(r.options) && r.options.length >= 2){
+    const opts = shuffle(r.options);
+    body.innerHTML =
+      '<div class="g-instruction">'+esc(r.instruction)+'</div>'+ sentenceHtml +
+      '<div class="g-chips" id="g-opts"></div>'+
+      (r.hint ? '<div class="g-hint">💡 '+esc(r.hint)+'</div>' : '');
+    let sel = -1;
+    const wrap = $('g-opts');
+    opts.forEach((o,i) => {
+      const c = document.createElement('span');
+      c.className = 'g-chip'; c.textContent = o;
+      c.addEventListener('click', () => {
+        if (G.answered) return;
+        sel = i;
+        wrap.querySelectorAll('.g-chip').forEach(x => x.classList.remove('sel'));
+        c.classList.add('sel');
+      });
+      wrap.appendChild(c);
+    });
+    setAction('Check');
+    G.check = () => {
+      if (sel < 0){ feedback('bad','Tap an option first.'); return null; }
+      const chips = wrap.querySelectorAll('.g-chip');
+      const ok = r.accept.some(a => norm(a) === norm(opts[sel]));
+      chips.forEach((c,i) => { c.classList.add('disabled'); c.classList.remove('sel');
+        const isAns = r.accept.some(a => norm(a) === norm(opts[i]));
+        if (isAns) c.classList.add('correct'); else if (i===sel) c.classList.add('wrong'); });
+      return { correct:ok, msg: ok?'Spot on!':'The word was “'+esc(r.answer)+'”.' };
+    };
+    return;
+  }
+
+  // Typing fallback (with one extra-clue retry) for rounds without options.
   body.innerHTML =
-    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+
-    '<div class="g-sentence">'+esc(parts[0]||'')+'<span class="g-blank">?</span>'+esc(parts[1]||'')+'</div>'+
+    '<div class="g-instruction">'+esc(r.instruction)+'</div>'+ sentenceHtml +
     '<input class="g-input" id="g-typed" placeholder="Type the word…" autocomplete="off" autocapitalize="off">'+
     '<div class="g-hint" id="g-extra-hint">'+(r.hint ? '💡 '+esc(r.hint) : '')+'</div>';
   const inp = $('g-typed'); inp.focus();
@@ -1569,7 +1620,6 @@ function renderGapfill(r, body){
     if (ok) return { correct:true, msg:'Spot on!' };
     attempts++;
     if (attempts === 1){
-      // one more chance, with an extra letter/length clue
       const w = String(r.answer||'');
       const first = w.charAt(0);
       const extra = first ? ('It begins with “' + first.toUpperCase() + '” and has ' + w.replace(/\s/g,'').length + ' letters.') : 'Look at the hint again.';
