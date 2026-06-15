@@ -1226,60 +1226,100 @@ function tokenize(text){
   return toks;
 }
 function normTok(w){ return String(w||'').toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/g,''); }
-// Word-level LCS → list of {oText,oS,oE,uText,uS,uE} change pairs (both sides non-empty).
+// Word-level diff → list of {oText,oS,oE,uText,uS,uE} change pairs (both sides
+// non-empty). Uses recursive unique-anchor splitting (patience-style) so cost
+// stays bounded for long essays, falling back to bounded LCS on each chunk.
 function wordDiff(origPlain, upgPlain){
   const A = tokenize(origPlain), B = tokenize(upgPlain);
-  const n = A.length, mlen = B.length;
-  if (!n || !mlen) return [];
-  // LCS DP (cap to keep it cheap)
-  if (n*mlen > 400000) return [];
-  const dp = Array.from({length:n+1}, () => new Uint16Array(mlen+1));
-  for (let i=n-1;i>=0;i--) for (let j=mlen-1;j>=0;j--)
-    dp[i][j] = (normTok(A[i].w)===normTok(B[j].w) && normTok(A[i].w)) ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
-  const pairs = []; let i=0, j=0, oi=0, uj=0;
-  const flush = (oEnd,uEnd) => {
-    if (oi<oEnd && uj<uEnd){
-      pairs.push({ oText:origPlain.slice(A[oi].s, A[oEnd-1].e), oS:A[oi].s, oE:A[oEnd-1].e,
-                   uText:upgPlain.slice(B[uj].s, B[uEnd-1].e), uS:B[uj].s, uE:B[uEnd-1].e });
+  if (!A.length || !B.length) return [];
+  const out = [];
+  diffRange(origPlain, upgPlain, A, B, 0, A.length, 0, B.length, out);
+  return out;
+}
+function diffRange(orig, upg, A, B, a0, a1, b0, b1, out){
+  // strip already-matching words at both ends of this range (cheap, common)
+  while (a0 < a1 && b0 < b1 && normTok(A[a0].w) && normTok(A[a0].w) === normTok(B[b0].w)){ a0++; b0++; }
+  while (a1 > a0 && b1 > b0 && normTok(A[a1-1].w) && normTok(A[a1-1].w) === normTok(B[b1-1].w)){ a1--; b1--; }
+  if (a0 >= a1 && b0 >= b1) return;                       // nothing left
+  const na = a1 - a0, nb = b1 - b0;
+  if (na > 0 && nb > 0 && na * nb > 40000){
+    const anc = findUniqueAnchor(A, B, a0, a1, b0, b1);   // split on a reliable common word
+    if (anc){
+      diffRange(orig, upg, A, B, a0, anc.a, b0, anc.b, out);
+      diffRange(orig, upg, A, B, anc.a+1, a1, anc.b+1, b1, out);
+      return;
     }
-  };
-  while (i<n && j<mlen){
-    if (normTok(A[i].w)===normTok(B[j].w) && normTok(A[i].w)){
-      flush(i, j); i++; j++; oi=i; uj=j;
-    } else if (dp[i+1][j] >= dp[i][j+1]) i++; else j++;
   }
-  flush(n, mlen);
-  return pairs;
+  lcsDiff(orig, upg, A, B, a0, a1, b0, b1, out);
+}
+function findUniqueAnchor(A, B, a0, a1, b0, b1){
+  const countA = {}, countB = {}, posA = {}, posB = {};
+  for (let i=a0;i<a1;i++){ const w = normTok(A[i].w); if (w.length>=5){ countA[w]=(countA[w]||0)+1; posA[w]=i; } }
+  for (let j=b0;j<b1;j++){ const w = normTok(B[j].w); if (w.length>=5){ countB[w]=(countB[w]||0)+1; posB[w]=j; } }
+  let best=null, bestDist=Infinity;
+  for (const w in countA){
+    if (countA[w]===1 && countB[w]===1){
+      const mid=(a0+a1)/2, d=Math.abs(posA[w]-mid);   // pick an anchor near the middle for balance
+      if (d<bestDist){ bestDist=d; best={a:posA[w], b:posB[w]}; }
+    }
+  }
+  return best;
+}
+function lcsDiff(orig, upg, A, B, a0, a1, b0, b1, out){
+  const na = a1-a0, nb = b1-b0;
+  if (na<=0 && nb<=0) return;
+  if (na<=0 || nb<=0){                                   // pure insert/delete → emit if both sides exist elsewhere
+    if (na>0 && nb>0) out.push(mkPair(orig,upg,A,B,a0,a1,b0,b1));
+    return;
+  }
+  if (na*nb > 1200000){                                  // safety net for pathological size: emit whole block
+    out.push(mkPair(orig,upg,A,B,a0,a1,b0,b1)); return;
+  }
+  const dp = Array.from({length:na+1}, () => new Uint16Array(nb+1));
+  for (let i=na-1;i>=0;i--) for (let j=nb-1;j>=0;j--)
+    dp[i][j] = (normTok(A[a0+i].w)===normTok(B[b0+j].w) && normTok(A[a0+i].w)) ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  let i=0, j=0, oi=0, uj=0;
+  const flush = (oEnd,uEnd) => { if (oi<oEnd && uj<uEnd) out.push(mkPair(orig,upg,A,B,a0+oi,a0+oEnd,b0+uj,b0+uEnd)); };
+  while (i<na && j<nb){
+    if (normTok(A[a0+i].w)===normTok(B[b0+j].w) && normTok(A[a0+i].w)){ flush(i,j); i++; j++; oi=i; uj=j; }
+    else if (dp[i+1][j] >= dp[i][j+1]) i++; else j++;
+  }
+  flush(na, nb);
+}
+function mkPair(orig, upg, A, B, a0, a1, b0, b1){
+  return { oText:orig.slice(A[a0].s, A[a1-1].e), oS:A[a0].s, oE:A[a1-1].e,
+           uText:upg.slice(B[b0].s, B[b1-1].e), uS:B[b0].s, uE:B[b1-1].e };
 }
 // Synthesize table rows only for diff changes NOT already covered (by character
 // span) by a real table row, so we never conflict with an existing row.
 function ensureFullCoverage(level, origPlain, upgPlain, oSpans, uSpans){
   if (level._coverageDone) return;
-  level._coverageDone = true;
   const vocab = level.vocabUpgrades || (level.vocabUpgrades = []);
   const grammar = level.grammarUpgrades || (level.grammarUpgrades = []);
   const overlaps = (s,e,spans) => spans.some(sp => s < sp.e && e > sp.s);
   const claimedO = oSpans.slice(), claimedU = uSpans.slice();
   let vN = vocab.length + 1, gN = grammar.length + 1;
-
-  wordDiff(origPlain, upgPlain).forEach(ch => {
-    if (overlaps(ch.oS, ch.oE, claimedO) || overlaps(ch.uS, ch.uE, claimedU)) return;  // already covered
-    const t = trimEdgesJS(ch.oText.trim(), ch.uText.trim());
-    const o = t.original, r = t.replacement;
-    if (!o || !r || o.toLowerCase() === r.toLowerCase()) return;
-    claimedO.push({ s:ch.oS, e:ch.oE }); claimedU.push({ s:ch.uS, e:ch.uE });
-    const ow = o.split(/\s+/).length, rw = r.split(/\s+/).length;
-    if (ow <= 3 && rw <= 4){
-      vocab.push({ id:'V'+(vN++)+'x', synthetic:true, marked:true,
-        original:o, originalLevel:'', replacement:r, replacementLevel:activeLevel,
-        definition:'An upgraded way to express “'+o+'”.', partOfSpeech:'',
-        synonyms:[], antonyms:[], examples:[], collocations:[], imageDescription:'' });
-    } else {
-      grammar.push({ id:'G'+(gN++)+'x', synthetic:true, marked:true,
-        original:o, originalLevel:'', replacement:r, replacementLevel:activeLevel,
-        topic:'Phrasing upgrade', subTopic:'', steps:[] });
-    }
-  });
+  try {
+    wordDiff(origPlain, upgPlain).forEach(ch => {
+      if (overlaps(ch.oS, ch.oE, claimedO) || overlaps(ch.uS, ch.uE, claimedU)) return;  // already covered
+      const t = trimEdgesJS(ch.oText.trim(), ch.uText.trim());
+      const o = t.original, r = t.replacement;
+      if (!o || !r || o.toLowerCase() === r.toLowerCase()) return;
+      claimedO.push({ s:ch.oS, e:ch.oE }); claimedU.push({ s:ch.uS, e:ch.uE });
+      const ow = o.split(/\s+/).length, rw = r.split(/\s+/).length;
+      if (ow <= 2 && rw <= 3){
+        vocab.push({ id:'V'+(vN++)+'x', synthetic:true, marked:true,
+          original:o, originalLevel:'', replacement:r, replacementLevel:activeLevel,
+          definition:'An upgraded way to say “'+o+'”.', partOfSpeech:'',
+          synonyms:[], antonyms:[], examples:[], collocations:[], imageDescription:'' });
+      } else {
+        grammar.push({ id:'G'+(gN++)+'x', synthetic:true, marked:true,
+          original:o, originalLevel:'', replacement:r, replacementLevel:activeLevel,
+          topic:'Phrasing & word choice', subTopic:'', steps:[] });
+      }
+    });
+    level._coverageDone = true;            // only mark done once it actually completed
+  } catch(e){ /* leave _coverageDone unset so it can retry on next render */ }
 }
 // Trim words shared at the start/end of an original→replacement pair (client side).
 function trimEdgesJS(o, r){
