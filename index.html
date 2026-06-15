@@ -1227,14 +1227,36 @@ function tokenize(text){
 }
 function normTok(w){ return String(w||'').toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/g,''); }
 // Word-level diff → list of {oText,oS,oE,uText,uS,uE} change pairs (both sides
-// non-empty). Uses recursive unique-anchor splitting (patience-style) so cost
-// stays bounded for long essays, falling back to bounded LCS on each chunk.
+// non-empty). Sentence-scoped first (so a word in one sentence can never pair
+// with a word in another), with an anchor-chunked fallback for bounded cost.
 function wordDiff(origPlain, upgPlain){
   const A = tokenize(origPlain), B = tokenize(upgPlain);
   if (!A.length || !B.length) return [];
   const out = [];
+  const os = splitSentences(origPlain), us = splitSentences(upgPlain);
+  if (os.length > 1 && os.length === us.length){
+    // conservative upgrades keep sentence count → align 1:1 by order, diff within each
+    const or = tokenSentenceRanges(A, os), ur = tokenSentenceRanges(B, us);
+    for (let k=0;k<os.length;k++) diffRange(origPlain, upgPlain, A, B, or[k][0], or[k][1], ur[k][0], ur[k][1], out);
+    return out;
+  }
   diffRange(origPlain, upgPlain, A, B, 0, A.length, 0, B.length, out);
   return out;
+}
+function splitSentences(text){
+  const out = []; const re = /[^.!?]*[.!?]+|[^.!?]+$/g; let m;
+  while ((m = re.exec(String(text||''))) !== null){ if (m[0].trim()) out.push({ s:m.index, e:m.index+m[0].length }); }
+  return out.length ? out : [{ s:0, e:String(text||'').length }];
+}
+function tokenSentenceRanges(toks, sents){
+  const ranges = sents.map(() => [-1,-1]);
+  let si = 0;
+  for (let t=0;t<toks.length;t++){
+    while (si < sents.length-1 && toks[t].s >= sents[si].e) si++;
+    if (ranges[si][0] < 0) ranges[si][0] = t;
+    ranges[si][1] = t+1;
+  }
+  return ranges.map(r => r[0] < 0 ? [0,0] : r);
 }
 function diffRange(orig, upg, A, B, a0, a1, b0, b1, out){
   // strip already-matching words at both ends of this range (cheap, common)
@@ -1305,6 +1327,7 @@ function ensureFullCoverage(level, origPlain, upgPlain, oSpans, uSpans){
       const t = trimEdgesJS(ch.oText.trim(), ch.uText.trim());
       const o = t.original, r = t.replacement;
       if (!o || !r || o.toLowerCase() === r.toLowerCase()) return;
+      if (!meaningfulChange(o, r)) return;   // skip lateral/function-word-only micro-edits
       claimedO.push({ s:ch.oS, e:ch.oE }); claimedU.push({ s:ch.uS, e:ch.uE });
       const ow = o.split(/\s+/).length, rw = r.split(/\s+/).length;
       if (ow <= 2 && rw <= 3){
@@ -1333,7 +1356,19 @@ function trimEdgesJS(o, r){
   const no = ow.slice(st, oe).join(' '), nr = rw.slice(st, re).join(' ');
   return (no && nr) ? { original:no, replacement:nr } : { original:o, replacement:r };
 }
-
+// Low-content words: a change made up ONLY of these on both sides is lateral
+// noise (e.g. "in"→"across", "back"→"ago"), not a real CEFR upgrade.
+const LOW_CONTENT = new Set(('a an the and or but so yet for nor of to in on at by up out off over under into onto from with within without across through about as is are was were be been being am has have had do does did will would shall should can could may might must i you he she it we they me him her us them my your his its our their this that these those there here then now back ago just very really quite too also again more most some any no not n\'t s ll re ve d m').split(/\s+/));
+function meaningfulChange(o, r){
+  const words = s => s.toLowerCase().replace(/[^a-z0-9'\s]/g,' ').split(/\s+/).filter(Boolean);
+  const ow = words(o), rw = words(r);
+  if (!ow.length || !rw.length) return false;
+  const allLow = arr => arr.every(w => LOW_CONTENT.has(w));
+  if (allLow(ow) && allLow(rw)) return false;          // both sides purely function words → lateral noise
+  // a single short token swapped for another single short token, neither a clear content word
+  if (ow.length === 1 && rw.length === 1 && o.length <= 4 && r.length <= 4) return false;
+  return true;
+}
 /* Shared CEFR button row used on Upgrades, Vocabulary and Grammar tabs.
  * - levels below the default are greyed (you only upgrade up)
  * - the active level is highlighted
