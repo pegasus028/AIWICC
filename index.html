@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Writing Coach Console &amp; Upgrade Studio</title>
+<title>SWEP Essay Marker — CEFR Assessment &amp; Upgrade Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
@@ -223,6 +223,49 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
 .g-final .gf-stars{font-size:2rem;letter-spacing:6px;margin:8px 0;}
 .g-final .gf-msg{font-size:1.05rem;color:var(--ink-soft);margin-bottom:8px;}
 .tile-launch{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+
+/* ===== study cards ===== */
+#study-thai{font-weight:700;border-color:var(--gold-soft);color:var(--gold);}
+#study-thai.on{background:var(--gold);color:#fff;border-color:var(--gold);}
+.sc{display:flex;flex-direction:column;gap:14px;}
+.sc-emoji{font-size:3.4rem;text-align:center;line-height:1;}
+.sc-word{font-family:"Fraunces",serif;font-weight:600;font-size:2rem;text-align:center;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+.sc-pos{font-size:.82rem;color:var(--ink-faint);text-align:center;margin-top:-8px;}
+.speak{border:1.5px solid var(--gold-soft);background:#fff;color:var(--gold);border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:1.1rem;display:inline-flex;align-items:center;justify-content:center;flex:none;transition:.12s;}
+.speak:hover{background:var(--gold-wash);}
+.speak.sm{width:30px;height:30px;font-size:.95rem;}
+.sc-wasnow{text-align:center;font-family:"Newsreader",Georgia,serif;font-size:1.05rem;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 12px;}
+.sc-wasnow .was{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--accent-soft);}
+.sc-wasnow .now{color:var(--accent);font-weight:600;}
+.sc-block{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.sc-k{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold);margin-bottom:4px;}
+.sc-def{font-size:1rem;color:var(--ink);}
+.sc-thai{font-size:1.02rem;color:var(--ink);background:var(--gold-wash);border:1px solid var(--gold-soft);border-radius:10px;padding:10px 13px;line-height:1.7;}
+.sc-thai .tt{display:block;font-size:.92rem;color:var(--ink-soft);margin-top:6px;}
+.sc-ex{font-family:"Newsreader",Georgia,serif;font-size:1.04rem;color:var(--ink-soft);display:flex;align-items:center;gap:10px;}
+.sc-ex b{color:var(--accent);font-style:normal;}
+.sc-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.sc-chip{font-size:.86rem;background:var(--paper);border:1px solid var(--line-strong);border-radius:14px;padding:4px 11px;color:var(--ink-soft);}
+.ladder{width:100%;}
+.ladder text{font-family:"Inter",sans-serif;}
+/* grammar pattern */
+.pat{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.pat-chunk{font-family:"Newsreader",Georgia,serif;font-size:1.05rem;font-weight:600;border-radius:9px;padding:7px 13px;color:#fff;}
+.pat-clause1{background:#9a3412;}
+.pat-clause2{background:#3f6212;}
+.pat-connector{background:#b08d3e;}
+.pat-marker{background:#5c5343;}
+.pat-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--ink-soft);margin-top:8px;}
+.pat-legend span{display:inline-flex;align-items:center;gap:5px;}
+.pat-dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+.timeline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px;}
+.tl-cell{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;background:#fff;}
+.tl-cell .tl-when{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);}
+.tl-cell.act{background:var(--gold-wash);border-color:var(--gold-soft);}
+.tl-cell.act .tl-when{color:var(--gold);}
+.tl-arrow{text-align:center;color:var(--ink-faint);font-size:.8rem;margin:4px 0 0;}
+.sc-steps{margin:0;padding-left:18px;}
+.sc-steps li{font-size:.92rem;color:var(--ink-soft);margin-bottom:5px;}
 
 /* upgrades split screen */
 .up-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--gold-wash);border:1.5px solid var(--gold-soft);border-radius:12px;padding:14px 20px;margin-bottom:18px;}
@@ -462,6 +505,7 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         <button class="ghost" type="button" id="vocab-export-btn">📤 Export to Google Sheet</button>
         <button class="ghost" type="button" id="vocab-blooket-btn">🎮 Generate Blooket game file</button>
         <button class="ghost" type="button" id="vocab-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
+        <button class="ghost" type="button" id="vocab-study-btn" style="border-color:var(--accent-soft);color:var(--accent)">📚 Study cards</button>
       </div>
       <div class="tool-note" id="vocab-note"></div>
       <h2>Vocabulary upgrade table</h2>
@@ -477,6 +521,7 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         <button class="ghost" type="button" id="grammar-export-btn">📤 Export to Google Sheet</button>
         <button class="ghost" type="button" id="grammar-blooket-btn">🎮 Generate Blooket game file</button>
         <button class="ghost" type="button" id="grammar-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
+        <button class="ghost" type="button" id="grammar-study-btn" style="border-color:var(--accent-soft);color:var(--accent)">📚 Study cards</button>
       </div>
       <div class="tool-note" id="grammar-note"></div>
       <h2>Grammar upgrade table</h2>
@@ -572,6 +617,30 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
     <div class="game-foot">
       <div class="game-feedback" id="game-feedback"></div>
       <button class="main" id="game-action" type="button" style="margin-top:0;width:auto;min-width:150px">Check</button>
+    </div>
+  </div>
+</div>
+
+<div class="game-overlay hidden" id="study-overlay">
+  <div class="game-shell">
+    <div class="game-top">
+      <div>
+        <div class="game-title" id="study-title">Study Cards</div>
+        <div class="game-theme" id="study-sub"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="ghost" id="study-thai" type="button" style="padding:6px 12px">ไทย</button>
+        <button class="game-x" id="study-close" type="button" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="game-meta">
+      <div class="game-prog"><div class="game-prog-fill" id="study-prog"></div></div>
+      <div class="game-stats"><span id="study-step">—</span></div>
+    </div>
+    <div class="game-body" id="study-body"></div>
+    <div class="game-foot">
+      <button class="ghost" id="study-prev" type="button">← Back</button>
+      <button class="main" id="study-next" type="button" style="margin-top:0;width:auto;min-width:130px">Next →</button>
     </div>
   </div>
 </div>
@@ -897,6 +966,7 @@ async function loadStored(id){
  * ============================================================ */
 function renderAll(){
   unlockTabs();
+  S.cache = {};
   renderReport();
   renderUpgrades();
   renderVocabTable();
@@ -1876,6 +1946,141 @@ function renderFinal(){
   setAction('Done');
   $('g-replay').addEventListener('click', () => startGame(G.pack));
   $('g-newpack').addEventListener('click', () => { const k = G.pack.kind; closeGame(); launchGame(k); });
+}
+
+/* =================================================================
+ * STUDY CARDS — swipeable bilingual micro-lessons with audio + visuals
+ * ================================================================= */
+const S = { cards:[], idx:0, kind:'vocab', thai:false, cache:{} };
+
+$('vocab-study-btn').addEventListener('click', () => openStudy('vocab'));
+$('grammar-study-btn').addEventListener('click', () => openStudy('grammar'));
+$('study-close').addEventListener('click', () => $('study-overlay').classList.add('hidden'));
+$('study-prev').addEventListener('click', () => { if (S.idx>0){ S.idx--; renderCard(); } });
+$('study-next').addEventListener('click', () => { if (S.idx < S.cards.length-1){ S.idx++; renderCard(); } else $('study-overlay').classList.add('hidden'); });
+$('study-thai').addEventListener('click', () => { S.thai = !S.thai; $('study-thai').classList.toggle('on', S.thai); renderCard(); });
+
+function speak(text, lang){
+  try {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text||''));
+    u.lang = lang || 'en-US'; u.rate = 0.92;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+}
+window.studySpeak = speak;
+
+async function openStudy(kind){
+  if (!current) return;
+  const items = kind==='vocab' ? vocabRows() : grammarRows();
+  const note = $(kind+'-note');
+  if (!items.length){ note.className='tool-note err'; note.textContent='No items to study at this level.'; return; }
+  note.className='tool-note';
+  const cacheKey = kind + '|' + activeLevel;
+  try {
+    let addons = S.cache[cacheKey];
+    if (!addons){
+      loading(true, 'Building your study cards…', 'Adding Thai meanings, audio and visuals for each item.');
+      const out = await api({ action:'study_pack', kind:kind, targetLevel:activeLevel,
+        name:(current.meta&&current.meta.name)||'Student', items:items });
+      loading(false);
+      addons = out.addons || {};
+      S.cache[cacheKey] = addons;
+    }
+    S.kind = kind; S.idx = 0;
+    S.cards = items.map(it => ({ item:it, add: addons[it.id] || {} }));
+    $('study-title').textContent = kind==='vocab' ? 'Vocabulary Study Cards' : 'Grammar Study Cards';
+    $('study-sub').textContent = 'Level ' + activeLevel + ' · ' + S.cards.length + ' cards · tap 🔊 to listen';
+    $('study-overlay').classList.remove('hidden');
+    renderCard();
+  } catch(err){
+    loading(false);
+    note.className='tool-note err'; note.textContent='Could not build study cards: ' + err.message;
+  }
+}
+
+function stripLvl(s){ return String(s||'').replace(/\s*\([ABC][12]\)\s*$/,'').trim(); }
+
+function renderCard(){
+  const n = S.cards.length;
+  $('study-step').textContent = 'Card ' + (S.idx+1) + ' / ' + n;
+  $('study-prog').style.width = Math.round((S.idx+1)/n*100) + '%';
+  $('study-prev').disabled = S.idx===0;
+  $('study-next').textContent = S.idx < n-1 ? 'Next →' : 'Finish';
+  const body = $('study-body');
+  body.innerHTML = (S.kind==='vocab') ? vocabCard(S.cards[S.idx]) : grammarCard(S.cards[S.idx]);
+  body.scrollTop = 0;
+  body.querySelectorAll('[data-say]').forEach(b => b.addEventListener('click', () => speak(b.dataset.say, b.dataset.lang||'en-US')));
+}
+
+function vocabCard(c){
+  const v = c.item, a = c.add;
+  const ex = (v.examples && v.examples[0]) ? v.examples[0] : '';
+  const thai = S.thai && (a.thaiDefinition || a.thaiTip)
+    ? '<div class="sc-thai">🇹🇭 '+esc(a.thaiDefinition||'')+(a.thaiTip?'<span class="tt">💡 '+esc(a.thaiTip)+'</span>':'')+'</div>' : '';
+  return (
+    (a.emoji ? '<div class="sc-emoji">'+esc(a.emoji)+'</div>' : '') +
+    '<div class="sc-word">'+esc(v.replacement)+'<button class="speak" data-say="'+esc(v.replacement)+'" title="Listen">🔊</button></div>'+
+    '<div class="sc-pos">'+esc(v.partOfSpeech||'')+' · '+esc(v.replacementLevel||'')+'</div>'+
+    (v.original ? '<div class="sc-wasnow"><span class="was">'+esc(v.original)+'</span> &nbsp;→&nbsp; <span class="now">'+esc(v.replacement)+'</span></div>' : '')+
+    '<div class="sc-block"><div class="sc-k">Meaning</div><div class="sc-def">'+esc(v.definition)+'</div></div>'+
+    thai +
+    (ex ? '<div class="sc-block"><div class="sc-k">In a sentence</div><div class="sc-ex"><button class="speak sm" data-say="'+esc(ex)+'">🔊</button><span>'+esc(ex)+'</span></div></div>' : '')+
+    synonymLadder(v) +
+    ((v.collocations&&v.collocations.length) ? '<div class="sc-block"><div class="sc-k">Goes well with</div><div class="sc-chips">'+v.collocations.map(x=>'<span class="sc-chip">'+esc(x)+'</span>').join('')+'</div></div>' : '')
+  );
+}
+
+/* Synonym/antonym "word strength" ladder built from existing tagged data. */
+function synonymLadder(v){
+  const syn = (v.synonyms||[]).map(s=>({w:stripLvl(s), lv:(s.match(/\(([ABC][12])\)/)||[])[1]||''}));
+  const ant = (v.antonyms||[]).map(s=>({w:stripLvl(s), lv:(s.match(/\(([ABC][12])\)/)||[])[1]||''}));
+  if (!syn.length && !ant.length) return '';
+  const rowH = 30, padTop = 26, W = 300;
+  const rows = Math.max(syn.length, ant.length);
+  const H = padTop + rows*rowH + 10;
+  let svg = '<svg class="ladder" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img">';
+  svg += '<text x="8" y="16" font-size="11" fill="#3f6212" font-weight="700">SIMILAR (synonyms)</text>';
+  svg += '<text x="'+(W-8)+'" y="16" font-size="11" fill="#9a3412" font-weight="700" text-anchor="end">OPPOSITE (antonyms)</text>';
+  svg += '<line x1="'+(W/2)+'" y1="20" x2="'+(W/2)+'" y2="'+(H-6)+'" stroke="#e9e0cc" stroke-width="1"/>';
+  syn.forEach((s,i)=>{ const y=padTop+i*rowH;
+    svg += '<rect x="6" y="'+y+'" width="'+(W/2-16)+'" height="22" rx="6" fill="#f0f4e6" stroke="#3f6212" stroke-width="1"/>';
+    svg += '<text x="14" y="'+(y+15)+'" font-size="12" fill="#211c14">'+esc(s.w)+(s.lv?'  <tspan fill="#8a8068" font-size="10">'+s.lv+'</tspan>':'')+'</text>'; });
+  ant.forEach((s,i)=>{ const y=padTop+i*rowH;
+    svg += '<rect x="'+(W/2+10)+'" y="'+y+'" width="'+(W/2-16)+'" height="22" rx="6" fill="#fbeee6" stroke="#9a3412" stroke-width="1"/>';
+    svg += '<text x="'+(W/2+18)+'" y="'+(y+15)+'" font-size="12" fill="#211c14">'+esc(s.w)+(s.lv?'  <tspan fill="#8a8068" font-size="10">'+s.lv+'</tspan>':'')+'</text>'; });
+  svg += '</svg>';
+  return '<div class="sc-block"><div class="sc-k">Word map</div>'+svg+'</div>';
+}
+
+function grammarCard(c){
+  const g = c.item, a = c.add;
+  const conceptEN = a.conceptEN || '';
+  const pattern = (a.patternParts && a.patternParts.length)
+    ? '<div class="pat">'+a.patternParts.map(pp=>'<span class="pat-chunk pat-'+esc(pp.role)+'">'+esc(pp.text)+'</span>').join('')+'</div>'+
+      '<div class="pat-legend"><span><i class="pat-dot pat-clause1"></i>part 1</span><span><i class="pat-dot pat-connector"></i>connector</span><span><i class="pat-dot pat-clause2"></i>part 2</span></div>'
+    : (a.pattern ? '<div class="pat"><span class="pat-chunk pat-marker">'+esc(a.pattern)+'</span></div>' : '');
+  const thai = S.thai && a.thaiConcept ? '<div class="sc-thai">🇹🇭 '+esc(a.thaiConcept)+'</div>' : '';
+  let timeline = '';
+  if (a.timeline){
+    const slots = [['past','Past'],['present','Now'],['future','Future']];
+    timeline = '<div class="sc-block"><div class="sc-k">When it happens</div><div class="timeline">'+
+      slots.map(([k,lbl])=>{ const val=a.timeline[k]||''; return '<div class="tl-cell'+(val?' act':'')+'"><div class="tl-when">'+lbl+'</div><div>'+(val?esc(val):'—')+'</div></div>'; }).join('')+
+      '</div></div>';
+  }
+  return (
+    '<div class="sc-word" style="font-size:1.5rem">'+esc(g.topic)+'</div>'+
+    (g.subTopic ? '<div class="sc-pos">'+esc(g.subTopic)+'</div>' : '')+
+    (conceptEN ? '<div class="sc-block"><div class="sc-k">The idea</div><div class="sc-def">'+esc(conceptEN)+'</div></div>' : '')+
+    thai +
+    (pattern ? '<div class="sc-block"><div class="sc-k">The pattern</div>'+pattern+'</div>' : '')+
+    timeline +
+    '<div class="sc-block"><div class="sc-k">Your sentence, upgraded</div>'+
+      (g.original?'<div class="sc-wasnow" style="text-align:left"><span class="was">'+esc(g.original)+'</span></div>':'')+
+      '<div class="sc-ex" style="margin-top:8px"><button class="speak sm" data-say="'+esc(g.replacement)+'">🔊</button><span><b>'+esc(g.replacement)+'</b></span></div></div>'+
+    ((g.steps&&g.steps.length) ? '<div class="sc-block"><div class="sc-k">How to master it</div><ol class="sc-steps">'+g.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></div>' : '')
+  );
 }
 
 /* ---------------- startup ---------------- */
