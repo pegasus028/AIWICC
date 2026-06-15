@@ -1083,13 +1083,84 @@ function renderUpgrades(){
   $('up-to').textContent = activeLevel;
   $('orig-lv').textContent = a.overallLevel;
   $('up-summary').textContent = u.summary || '';
-  $('orig-body').innerHTML = annotatedToHtml(u.originalAnnotated || current.essay);
-  $('upg-body').innerHTML  = annotatedToHtml(u.upgradedAnnotated || '');
+
+  // Deterministic highlighting: locate every vocab/grammar item's text in BOTH
+  // panes from the table itself, rather than trusting the model's markers. Only
+  // items found in BOTH panes are highlighted, so every highlight is paired.
+  const origPlain = stripMarkers(u.originalAnnotated) || current.essay || '';
+  const upgPlain  = stripMarkers(u.upgradedAnnotated) || '';
+  const items = vocabRows().concat(grammarRows())
+                  .map(x => ({ id:x.id, original:x.original, replacement:x.replacement }))
+                  .filter(x => x.id && x.original && x.replacement);
+  const pair = annotatePair(origPlain, upgPlain, items);
+
+  $('orig-body').innerHTML = annotatedToHtml(pair.original || origPlain);
+  $('upg-body').innerHTML  = annotatedToHtml(pair.upgraded || upgPlain);
   pinnedId = null;
   $('detail-card').classList.remove('show');
   bindSegEvents($('orig-body'), $('upg-body'));
   bindSegEvents($('upg-body'), $('orig-body'));
   renderCefrRow('upg-cefr-row');
+}
+
+function stripMarkers(text){ return String(text||'').replace(/\[\[\/?(?:V|G)\d+\]\]/g, ''); }
+
+/* Locate each item's text in both plain texts and wrap matched spans with the
+ * SAME id marker in each. Returns {original, upgraded} annotated strings. Only
+ * ids found (non-overlapping) in BOTH panes are marked → every highlight pairs. */
+function annotatePair(origPlain, upgPlain, items){
+  const oM = collectMatches(origPlain, items, 'original');
+  const uM = collectMatches(upgPlain, items, 'replacement');
+  const ids = items.map(i => i.id).filter(id => oM[id] && uM[id]);
+  return {
+    original: insertMarkers(origPlain, ids.map(id => ({ s:oM[id].s, e:oM[id].e, id:id }))),
+    upgraded: insertMarkers(upgPlain,  ids.map(id => ({ s:uM[id].s, e:uM[id].e, id:id })))
+  };
+}
+function collectMatches(plain, items, field){
+  plain = String(plain||'');
+  const lower = plain.toLowerCase();
+  const used = [];                 // chosen non-overlapping ranges
+  const byId = {};
+  // longer spans first so a grammar rewrite claims its span before a contained vocab word
+  const sorted = items.slice().sort((x,y) => String(y[field]||'').length - String(x[field]||'').length);
+  sorted.forEach(it => {
+    const span = findSpan(plain, lower, String(it[field]||'').trim(), used);
+    if (span){ used.push(span); byId[it.id] = span; }
+  });
+  return byId;
+}
+function findSpan(plain, lower, needle, used){
+  if (!needle) return null;
+  const nlow = needle.toLowerCase();
+  const startWord = /[a-z0-9]/i.test(nlow[0]);
+  const endWord = /[a-z0-9]/i.test(nlow[nlow.length-1]);
+  const overlaps = (s,e) => used.some(u => s < u.e && e > u.s);
+  let firstNonOverlap = null;
+  let from = 0;
+  while (true){
+    const i = lower.indexOf(nlow, from);
+    if (i < 0) break;
+    const e = i + nlow.length;
+    if (!overlaps(i, e)){
+      const before = i > 0 ? plain[i-1] : ' ';
+      const after  = e < plain.length ? plain[e] : ' ';
+      const boundaryOK = (!startWord || !/[a-z0-9]/i.test(before)) && (!endWord || !/[a-z0-9]/i.test(after));
+      if (boundaryOK) return { s:i, e:e };          // prefer a whole-word match
+      if (!firstNonOverlap) firstNonOverlap = { s:i, e:e };
+    }
+    from = i + 1;
+  }
+  return firstNonOverlap;                            // fall back to a partial match if needed
+}
+function insertMarkers(plain, marks){
+  plain = String(plain||'');
+  marks = marks.slice().sort((a,b) => b.s - a.s);    // right-to-left keeps indices valid
+  let out = plain;
+  marks.forEach(m => {
+    out = out.slice(0, m.s) + '[[' + m.id + ']]' + out.slice(m.s, m.e) + '[[/' + m.id + ']]' + out.slice(m.e);
+  });
+  return out;
 }
 
 /* Shared CEFR button row used on Upgrades, Vocabulary and Grammar tabs.
