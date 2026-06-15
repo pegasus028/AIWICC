@@ -266,6 +266,47 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
 .tl-arrow{text-align:center;color:var(--ink-faint);font-size:.8rem;margin:4px 0 0;}
 .sc-steps{margin:0;padding-left:18px;}
 .sc-steps li{font-size:.92rem;color:var(--ink-soft);margin-bottom:5px;}
+/* real photo */
+.sc-photo{position:relative;width:100%;max-width:320px;margin:0 auto;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+.sc-photo .sc-emoji{font-size:3.4rem;margin:0;}
+.sc-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease;}
+.sc-photo img.loaded{opacity:1;}
+.sc-photo .ai-tag{position:absolute;right:6px;bottom:5px;font-size:.62rem;color:#fff;background:rgba(33,28,20,.55);border-radius:6px;padding:1px 6px;z-index:2;}
+/* keyword highlight */
+.kw{background:var(--gold-wash);color:var(--accent);font-weight:600;border-radius:5px;padding:0 4px;box-shadow:inset 0 -2px 0 var(--gold);}
+/* HTML word map (selectable, wrapping) */
+.wm{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:480px){.wm{grid-template-columns:1fr;}}
+.wm-col h6{margin:0 0 7px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-align:center;}
+.wm-col.syn h6{color:var(--good);}
+.wm-col.ant h6{color:var(--accent);}
+.wm-tiles{display:flex;flex-direction:column;gap:7px;}
+.wm-tile{display:flex;justify-content:space-between;align-items:center;gap:8px;border-radius:10px;padding:8px 11px;cursor:pointer;font-size:.92rem;line-height:1.3;min-height:38px;transition:.12s;text-align:left;word-break:break-word;border:1.5px solid;}
+.wm-tile .wm-w{flex:1;}
+.wm-tile .wm-lv{font-size:.68rem;font-weight:700;color:#fff;border-radius:5px;padding:1px 6px;flex:none;}
+.wm-col.syn .wm-tile{background:var(--good-wash);border-color:#cfe0ac;color:var(--ink);}
+.wm-col.syn .wm-tile:hover{border-color:var(--good);box-shadow:0 2px 8px rgba(63,98,18,.15);}
+.wm-col.syn .wm-tile .wm-lv{background:var(--good);}
+.wm-col.ant .wm-tile{background:var(--accent-wash);border-color:#f0d3c4;color:var(--ink);}
+.wm-col.ant .wm-tile:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(154,52,18,.15);}
+.wm-col.ant .wm-tile .wm-lv{background:var(--accent-soft);}
+.wm-hint{font-size:.78rem;color:var(--ink-faint);text-align:center;margin-top:8px;}
+.lookup-back{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;color:var(--accent);background:var(--accent-wash);border:1px solid #f0d3c4;border-radius:9px;padding:6px 12px;cursor:pointer;margin-bottom:6px;}
+/* enacted grammar blocks */
+.en-block{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.en-title{font-size:.86rem;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.en-table{width:100%;border-collapse:collapse;font-size:.92rem;}
+.en-table th{background:var(--gold-wash);text-align:left;padding:7px 10px;border:1px solid var(--line);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);}
+.en-table td{padding:7px 10px;border:1px solid var(--line);font-family:"Newsreader",Georgia,serif;}
+.en-table tr:nth-child(even) td{background:#faf8f5;}
+.en-ex{font-family:"Newsreader",Georgia,serif;font-size:1rem;color:var(--ink);padding:5px 0;border-bottom:1px dashed var(--line);}
+.en-ex:last-child{border-bottom:none;}
+.en-pair{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0;border-bottom:1px dashed var(--line);}
+.en-pair:last-child{border-bottom:none;}
+.en-pair .ef{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--accent-soft);font-family:"Newsreader",Georgia,serif;}
+.en-pair .et{color:var(--accent);font-weight:600;font-family:"Newsreader",Georgia,serif;}
+.en-pair .ea{color:var(--gold);font-weight:700;}
+.en-tip{background:var(--good-wash);border:1px solid #d8e4bf;border-radius:10px;padding:10px 13px;font-size:.92rem;color:var(--ink);}
 
 /* upgrades split screen */
 .up-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--gold-wash);border:1.5px solid var(--gold-soft);border-radius:12px;padding:14px 20px;margin-bottom:18px;}
@@ -504,8 +545,8 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         <button class="ghost" type="button" onclick="printScreen('screen-vocab')">🖨 Print table</button>
         <button class="ghost" type="button" id="vocab-export-btn">📤 Export to Google Sheet</button>
         <button class="ghost" type="button" id="vocab-blooket-btn">🎮 Generate Blooket game file</button>
-        <button class="ghost" type="button" id="vocab-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
         <button class="ghost" type="button" id="vocab-study-btn" style="border-color:var(--accent-soft);color:var(--accent)">📚 Study cards</button>
+        <button class="ghost" type="button" id="vocab-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
       </div>
       <div class="tool-note" id="vocab-note"></div>
       <h2>Vocabulary upgrade table</h2>
@@ -520,8 +561,8 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         <button class="ghost" type="button" onclick="printScreen('screen-grammar')">🖨 Print table</button>
         <button class="ghost" type="button" id="grammar-export-btn">📤 Export to Google Sheet</button>
         <button class="ghost" type="button" id="grammar-blooket-btn">🎮 Generate Blooket game file</button>
-        <button class="ghost" type="button" id="grammar-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
         <button class="ghost" type="button" id="grammar-study-btn" style="border-color:var(--accent-soft);color:var(--accent)">📚 Study cards</button>
+        <button class="ghost" type="button" id="grammar-play-btn" style="border-color:var(--gold-soft);color:var(--gold)">🕹️ Play in-app game</button>
       </div>
       <div class="tool-note" id="grammar-note"></div>
       <h2>Grammar upgrade table</h2>
@@ -629,7 +670,6 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         <div class="game-theme" id="study-sub"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="ghost" id="study-thai" type="button" style="padding:6px 12px">ไทย</button>
         <button class="game-x" id="study-close" type="button" aria-label="Close">✕</button>
       </div>
     </div>
@@ -1951,25 +1991,23 @@ function renderFinal(){
 /* =================================================================
  * STUDY CARDS — swipeable bilingual micro-lessons with audio + visuals
  * ================================================================= */
-const S = { cards:[], idx:0, kind:'vocab', thai:false, cache:{} };
+const S = { cards:[], idx:0, kind:'vocab', cache:{}, lookup:null };
 
 $('vocab-study-btn').addEventListener('click', () => openStudy('vocab'));
 $('grammar-study-btn').addEventListener('click', () => openStudy('grammar'));
-$('study-close').addEventListener('click', () => $('study-overlay').classList.add('hidden'));
-$('study-prev').addEventListener('click', () => { if (S.idx>0){ S.idx--; renderCard(); } });
-$('study-next').addEventListener('click', () => { if (S.idx < S.cards.length-1){ S.idx++; renderCard(); } else $('study-overlay').classList.add('hidden'); });
-$('study-thai').addEventListener('click', () => { S.thai = !S.thai; $('study-thai').classList.toggle('on', S.thai); renderCard(); });
+$('study-close').addEventListener('click', () => { S.lookup=null; $('study-overlay').classList.add('hidden'); });
+$('study-prev').addEventListener('click', () => { if (S.lookup) return; if (S.idx>0){ S.idx--; renderCard(); } });
+$('study-next').addEventListener('click', () => { if (S.lookup) return; if (S.idx < S.cards.length-1){ S.idx++; renderCard(); } else { $('study-overlay').classList.add('hidden'); } });
 
-function speak(text, lang){
+function speak(text){
   try {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(String(text||''));
-    u.lang = lang || 'en-US'; u.rate = 0.92;
+    u.lang = 'en-US'; u.rate = 0.92;
     window.speechSynthesis.speak(u);
   } catch(e){}
 }
-window.studySpeak = speak;
 
 async function openStudy(kind){
   if (!current) return;
@@ -1981,14 +2019,14 @@ async function openStudy(kind){
   try {
     let addons = S.cache[cacheKey];
     if (!addons){
-      loading(true, 'Building your study cards…', 'Adding Thai meanings, audio and visuals for each item.');
+      loading(true, 'Building your study cards…', 'Adding pictures, audio and visual word maps for each item.');
       const out = await api({ action:'study_pack', kind:kind, targetLevel:activeLevel,
         name:(current.meta&&current.meta.name)||'Student', items:items });
       loading(false);
       addons = out.addons || {};
       S.cache[cacheKey] = addons;
     }
-    S.kind = kind; S.idx = 0;
+    S.kind = kind; S.idx = 0; S.lookup = null;
     S.cards = items.map(it => ({ item:it, add: addons[it.id] || {} }));
     $('study-title').textContent = kind==='vocab' ? 'Vocabulary Study Cards' : 'Grammar Study Cards';
     $('study-sub').textContent = 'Level ' + activeLevel + ' · ' + S.cards.length + ' cards · tap 🔊 to listen';
@@ -2001,57 +2039,133 @@ async function openStudy(kind){
 }
 
 function stripLvl(s){ return String(s||'').replace(/\s*\([ABC][12]\)\s*$/,'').trim(); }
+function lvlOf(s){ return (String(s||'').match(/\(([ABC][12])\)/)||[])[1]||''; }
 
-function renderCard(){
-  const n = S.cards.length;
-  $('study-step').textContent = 'Card ' + (S.idx+1) + ' / ' + n;
-  $('study-prog').style.width = Math.round((S.idx+1)/n*100) + '%';
-  $('study-prev').disabled = S.idx===0;
-  $('study-next').textContent = S.idx < n-1 ? 'Next →' : 'Finish';
-  const body = $('study-body');
-  body.innerHTML = (S.kind==='vocab') ? vocabCard(S.cards[S.idx]) : grammarCard(S.cards[S.idx]);
-  body.scrollTop = 0;
-  body.querySelectorAll('[data-say]').forEach(b => b.addEventListener('click', () => speak(b.dataset.say, b.dataset.lang||'en-US')));
+/* Wrap the first occurrence of the keyword (or its head word) in a sentence. */
+function highlightKeyword(sentence, keyword){
+  const text = String(sentence||'');
+  const kw = stripLvl(keyword||'').trim();
+  if (!kw) return esc(text);
+  const tryWrap = (needle) => {
+    if (!needle) return null;
+    const re = new RegExp('('+needle.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'i');
+    const m = text.match(re);
+    if (!m) return null;
+    const i = m.index, len = m[0].length;
+    return esc(text.slice(0,i)) + '<span class="kw">' + esc(text.slice(i,i+len)) + '</span>' + esc(text.slice(i+len));
+  };
+  let out = tryWrap(kw);
+  if (!out){                       // fall back to the head word's stem (handles inflection)
+    const head = kw.split(/\s+/)[0].replace(/(ed|ing|es|s)$/,'');
+    if (head.length >= 4) out = tryWrap(head + '\\w*');
+  }
+  return out || esc(text);
 }
 
-function vocabCard(c){
+/* Show an AI image (photo-quality) for the meaning, with emoji fallback. */
+function setupPhoto(container, imageDescription, emoji){
+  if (!container) return;
+  const desc = String(imageDescription||'').trim();
+  if (!desc) return;   // keep emoji only
+  const prompt = encodeURIComponent(desc + ', photorealistic, clear subject, simple background, no text');
+  const url = 'https://image.pollinations.ai/prompt/' + prompt + '?width=512&height=384&nologo=true&seed=7';
+  const img = new Image();
+  img.alt = desc;
+  img.addEventListener('load', () => { img.classList.add('loaded'); const tag=document.createElement('span'); tag.className='ai-tag'; tag.textContent='AI image'; container.appendChild(tag); });
+  img.addEventListener('error', () => { img.remove(); });   // emoji stays
+  container.appendChild(img);
+  img.src = url;
+}
+
+function renderCard(){
+  const inLookup = !!S.lookup;
+  const n = S.cards.length;
+  $('study-step').textContent = inLookup ? ('Looking up “'+esc(S.lookup.item.replacement)+'”') : ('Card ' + (S.idx+1) + ' / ' + n);
+  $('study-prog').style.width = inLookup ? '100%' : (Math.round((S.idx+1)/n*100) + '%');
+  $('study-prev').disabled = inLookup || S.idx===0;
+  $('study-prev').style.visibility = inLookup ? 'hidden' : '';
+  $('study-next').textContent = inLookup ? 'Close' : (S.idx < n-1 ? 'Next →' : 'Finish');
+  const card = inLookup ? S.lookup : S.cards[S.idx];
+  const body = $('study-body');
+  body.innerHTML = (S.kind==='vocab') ? vocabCard(card, inLookup) : grammarCard(card);
+  body.scrollTop = 0;
+  // audio
+  body.querySelectorAll('[data-say]').forEach(b => b.addEventListener('click', () => speak(b.dataset.say)));
+  // photo
+  const ph = body.querySelector('.sc-photo');
+  if (ph && S.kind==='vocab') setupPhoto(ph, card.item.imageDescription, card.add.emoji);
+  // selectable synonyms / antonyms → drill in
+  body.querySelectorAll('.wm-tile').forEach(t => t.addEventListener('click', () => lookupWord(t.dataset.word)));
+  // back from a lookup
+  const back = body.querySelector('.lookup-back');
+  if (back) back.addEventListener('click', () => { S.lookup = null; renderCard(); });
+}
+
+async function lookupWord(word){
+  if (!word) return;
+  try {
+    loading(true, 'Looking up “'+word+'”…', 'Building a study card for this word.');
+    const out = await api({ action:'study_word', word:word, promptText:(current.meta&&current.meta.prompt)||'' });
+    loading(false);
+    S.lookup = { item: out.card, add: { emoji: out.card.emoji } };
+    renderCard();
+  } catch(err){
+    loading(false);
+    alert('Could not look up that word: ' + err.message);
+  }
+}
+
+function wordMap(v){
+  const syn = (v.synonyms||[]).map(s=>({w:stripLvl(s), lv:lvlOf(s)})).filter(x=>x.w);
+  const ant = (v.antonyms||[]).map(s=>({w:stripLvl(s), lv:lvlOf(s)})).filter(x=>x.w);
+  if (!syn.length && !ant.length) return '';
+  const tile = (x) => '<button class="wm-tile" data-word="'+esc(x.w)+'"><span class="wm-w">'+esc(x.w)+'</span>'+(x.lv?'<span class="wm-lv">'+esc(x.lv)+'</span>':'')+'</button>';
+  return '<div class="sc-block"><div class="sc-k">Word map</div><div class="wm">'+
+    '<div class="wm-col syn"><h6>Similar</h6><div class="wm-tiles">'+(syn.map(tile).join('')||'<span class="wm-hint">—</span>')+'</div></div>'+
+    '<div class="wm-col ant"><h6>Opposite</h6><div class="wm-tiles">'+(ant.map(tile).join('')||'<span class="wm-hint">—</span>')+'</div></div>'+
+    '</div><div class="wm-hint">Tap any word to study it</div></div>';
+}
+
+function vocabCard(c, inLookup){
   const v = c.item, a = c.add;
-  const ex = (v.examples && v.examples[0]) ? v.examples[0] : '';
-  const thai = S.thai && (a.thaiDefinition || a.thaiTip)
-    ? '<div class="sc-thai">🇹🇭 '+esc(a.thaiDefinition||'')+(a.thaiTip?'<span class="tt">💡 '+esc(a.thaiTip)+'</span>':'')+'</div>' : '';
+  const examples = v.examples || [];
+  const captionEx = examples[0] || '';
+  const paneEx = examples[1] || examples[0] || '';
   return (
-    (a.emoji ? '<div class="sc-emoji">'+esc(a.emoji)+'</div>' : '') +
+    (inLookup ? '<button class="lookup-back">← Back to the deck</button>' : '') +
+    '<div class="sc-photo"><div class="sc-emoji">'+esc(a.emoji||'🖼️')+'</div></div>' +
     '<div class="sc-word">'+esc(v.replacement)+'<button class="speak" data-say="'+esc(v.replacement)+'" title="Listen">🔊</button></div>'+
-    '<div class="sc-pos">'+esc(v.partOfSpeech||'')+' · '+esc(v.replacementLevel||'')+'</div>'+
+    '<div class="sc-pos">'+esc(v.partOfSpeech||'')+(v.replacementLevel?' · '+esc(v.replacementLevel):'')+'</div>'+
+    (captionEx ? '<div class="sc-wasnow" style="font-style:italic">'+highlightKeyword(captionEx, v.replacement)+'</div>' : '')+
     (v.original ? '<div class="sc-wasnow"><span class="was">'+esc(v.original)+'</span> &nbsp;→&nbsp; <span class="now">'+esc(v.replacement)+'</span></div>' : '')+
     '<div class="sc-block"><div class="sc-k">Meaning</div><div class="sc-def">'+esc(v.definition)+'</div></div>'+
-    thai +
-    (ex ? '<div class="sc-block"><div class="sc-k">In a sentence</div><div class="sc-ex"><button class="speak sm" data-say="'+esc(ex)+'">🔊</button><span>'+esc(ex)+'</span></div></div>' : '')+
-    synonymLadder(v) +
+    (paneEx ? '<div class="sc-block"><div class="sc-k">In a sentence</div><div class="sc-ex"><button class="speak sm" data-say="'+esc(paneEx)+'">🔊</button><span>'+highlightKeyword(paneEx, v.replacement)+'</span></div></div>' : '')+
+    wordMap(v) +
     ((v.collocations&&v.collocations.length) ? '<div class="sc-block"><div class="sc-k">Goes well with</div><div class="sc-chips">'+v.collocations.map(x=>'<span class="sc-chip">'+esc(x)+'</span>').join('')+'</div></div>' : '')
   );
 }
 
-/* Synonym/antonym "word strength" ladder built from existing tagged data. */
-function synonymLadder(v){
-  const syn = (v.synonyms||[]).map(s=>({w:stripLvl(s), lv:(s.match(/\(([ABC][12])\)/)||[])[1]||''}));
-  const ant = (v.antonyms||[]).map(s=>({w:stripLvl(s), lv:(s.match(/\(([ABC][12])\)/)||[])[1]||''}));
-  if (!syn.length && !ant.length) return '';
-  const rowH = 30, padTop = 26, W = 300;
-  const rows = Math.max(syn.length, ant.length);
-  const H = padTop + rows*rowH + 10;
-  let svg = '<svg class="ladder" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img">';
-  svg += '<text x="8" y="16" font-size="11" fill="#3f6212" font-weight="700">SIMILAR (synonyms)</text>';
-  svg += '<text x="'+(W-8)+'" y="16" font-size="11" fill="#9a3412" font-weight="700" text-anchor="end">OPPOSITE (antonyms)</text>';
-  svg += '<line x1="'+(W/2)+'" y1="20" x2="'+(W/2)+'" y2="'+(H-6)+'" stroke="#e9e0cc" stroke-width="1"/>';
-  syn.forEach((s,i)=>{ const y=padTop+i*rowH;
-    svg += '<rect x="6" y="'+y+'" width="'+(W/2-16)+'" height="22" rx="6" fill="#f0f4e6" stroke="#3f6212" stroke-width="1"/>';
-    svg += '<text x="14" y="'+(y+15)+'" font-size="12" fill="#211c14">'+esc(s.w)+(s.lv?'  <tspan fill="#8a8068" font-size="10">'+s.lv+'</tspan>':'')+'</text>'; });
-  ant.forEach((s,i)=>{ const y=padTop+i*rowH;
-    svg += '<rect x="'+(W/2+10)+'" y="'+y+'" width="'+(W/2-16)+'" height="22" rx="6" fill="#fbeee6" stroke="#9a3412" stroke-width="1"/>';
-    svg += '<text x="'+(W/2+18)+'" y="'+(y+15)+'" font-size="12" fill="#211c14">'+esc(s.w)+(s.lv?'  <tspan fill="#8a8068" font-size="10">'+s.lv+'</tspan>':'')+'</text>'; });
-  svg += '</svg>';
-  return '<div class="sc-block"><div class="sc-k">Word map</div>'+svg+'</div>';
+function enactedBlocks(blocks){
+  if (!Array.isArray(blocks) || !blocks.length) return '';
+  return blocks.map(b => {
+    if (b.type === 'table'){
+      return '<div class="en-block"><div class="en-title">'+esc(b.title||'')+'</div><table class="en-table"><thead><tr>'+
+        b.headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+
+        b.rows.map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+    }
+    if (b.type === 'examples'){
+      return '<div class="en-block"><div class="en-title">'+esc(b.title||'')+'</div>'+
+        b.items.map(x=>'<div class="en-ex">'+esc(x)+'</div>').join('')+'</div>';
+    }
+    if (b.type === 'transform'){
+      return '<div class="en-block"><div class="en-title">'+esc(b.title||'')+'</div>'+
+        b.pairs.map(p=>'<div class="en-pair"><span class="ef">'+esc(p.from)+'</span><span class="ea">→</span><span class="et">'+esc(p.to)+'</span></div>').join('')+'</div>';
+    }
+    if (b.type === 'tip'){
+      return '<div class="en-tip">💡 '+esc(b.text)+'</div>';
+    }
+    return '';
+  }).join('');
 }
 
 function grammarCard(c){
@@ -2061,7 +2175,6 @@ function grammarCard(c){
     ? '<div class="pat">'+a.patternParts.map(pp=>'<span class="pat-chunk pat-'+esc(pp.role)+'">'+esc(pp.text)+'</span>').join('')+'</div>'+
       '<div class="pat-legend"><span><i class="pat-dot pat-clause1"></i>part 1</span><span><i class="pat-dot pat-connector"></i>connector</span><span><i class="pat-dot pat-clause2"></i>part 2</span></div>'
     : (a.pattern ? '<div class="pat"><span class="pat-chunk pat-marker">'+esc(a.pattern)+'</span></div>' : '');
-  const thai = S.thai && a.thaiConcept ? '<div class="sc-thai">🇹🇭 '+esc(a.thaiConcept)+'</div>' : '';
   let timeline = '';
   if (a.timeline){
     const slots = [['past','Past'],['present','Now'],['future','Future']];
@@ -2069,17 +2182,17 @@ function grammarCard(c){
       slots.map(([k,lbl])=>{ const val=a.timeline[k]||''; return '<div class="tl-cell'+(val?' act':'')+'"><div class="tl-when">'+lbl+'</div><div>'+(val?esc(val):'—')+'</div></div>'; }).join('')+
       '</div></div>';
   }
+  const enacted = enactedBlocks(a.enacted);
   return (
     '<div class="sc-word" style="font-size:1.5rem">'+esc(g.topic)+'</div>'+
     (g.subTopic ? '<div class="sc-pos">'+esc(g.subTopic)+'</div>' : '')+
     (conceptEN ? '<div class="sc-block"><div class="sc-k">The idea</div><div class="sc-def">'+esc(conceptEN)+'</div></div>' : '')+
-    thai +
     (pattern ? '<div class="sc-block"><div class="sc-k">The pattern</div>'+pattern+'</div>' : '')+
     timeline +
     '<div class="sc-block"><div class="sc-k">Your sentence, upgraded</div>'+
       (g.original?'<div class="sc-wasnow" style="text-align:left"><span class="was">'+esc(g.original)+'</span></div>':'')+
       '<div class="sc-ex" style="margin-top:8px"><button class="speak sm" data-say="'+esc(g.replacement)+'">🔊</button><span><b>'+esc(g.replacement)+'</b></span></div></div>'+
-    ((g.steps&&g.steps.length) ? '<div class="sc-block"><div class="sc-k">How to master it</div><ol class="sc-steps">'+g.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></div>' : '')
+    (enacted ? '<div class="sc-k" style="margin-top:4px">See it in action</div>'+enacted : '')
   );
 }
 
