@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SWEP Essay Marker — CEFR Assessment &amp; Upgrade Studio</title>
+<title>LevelUp English — CEFR Writing Coach</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
@@ -138,6 +138,20 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
 .rp-coach{font-size:.86rem;color:var(--warn);background:#fdf6ec;border:1px solid #f0d9b5;border-radius:10px;padding:9px 13px;margin-bottom:10px;}
 .rp-inputrow{display:flex;gap:10px;align-items:flex-end;}
 .rp-inputrow textarea{flex:1;min-height:54px;font-family:"Inter",sans-serif;font-size:.95rem;}
+.rp-hud{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(90deg,var(--gold-wash),#fff);border:1.5px solid var(--gold-soft);border-radius:12px;padding:8px 14px;margin-bottom:12px;}
+.rp-score-box{display:flex;flex-direction:column;line-height:1;}
+.rp-score-lbl{font-size:.6rem;font-weight:700;letter-spacing:.12em;color:var(--gold);}
+#rp-score{font-family:"Fraunces",serif;font-size:1.6rem;font-weight:600;color:var(--accent);transition:transform .15s;}
+#rp-score.bump{transform:scale(1.35);}
+.rp-combo{font-family:"Fraunces",serif;font-weight:600;font-size:1rem;color:#fff;background:var(--accent);border-radius:9px;padding:3px 12px;opacity:0;transform:scale(.6);transition:.18s;}
+.rp-combo.show{opacity:1;transform:scale(1);}
+.rp-words{margin-left:auto;font-size:.82rem;color:var(--ink-soft);font-weight:600;}
+.rp-suggestion{margin-top:10px;background:#fff;border:1.5px dashed var(--gold-soft);border-radius:10px;padding:11px 14px;font-family:"Newsreader",Georgia,serif;font-size:1rem;color:var(--ink-soft);}
+.rp-suggestion .rs-use{display:inline-block;margin-top:8px;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;color:var(--accent);background:var(--accent-wash);border:1px solid #f0d3c4;border-radius:8px;padding:5px 12px;cursor:pointer;}
+.combo-pop{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:80;font-family:"Fraunces",serif;font-weight:600;font-size:2.4rem;color:var(--gold);text-shadow:0 2px 12px rgba(176,141,62,.5);pointer-events:none;animation:comboPop 1.1s ease-out forwards;}
+@keyframes comboPop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}70%{opacity:1;transform:translate(-50%,-60%) scale(1);}100%{opacity:0;transform:translate(-50%,-90%) scale(1);}}
+.rp-chip.flash{animation:chipFlash .9s ease;}
+@keyframes chipFlash{0%{transform:scale(1);box-shadow:0 0 0 0 var(--gold);}30%{transform:scale(1.25);box-shadow:0 0 0 6px var(--gold-wash);background:var(--gold);color:#fff;}100%{transform:scale(1);}}
 .rp-typing{font-style:italic;color:var(--ink-faint);}
 
 /* ===== interactive game overlay ===== */
@@ -153,6 +167,25 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
 .game-meta{padding:0 22px 14px;}
 .game-prog{height:8px;background:var(--paper);border-radius:6px;overflow:hidden;border:1px solid var(--line);}
 .game-prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold-soft),var(--gold));transition:width .4s ease;}
+/* Story-style segmented progress (study cards) */
+.story-bar{display:flex;gap:4px;}
+.story-seg{flex:1;height:4px;border-radius:3px;background:var(--line);overflow:hidden;}
+.story-seg.done{background:var(--gold);}
+.story-seg.cur{background:var(--gold-soft);}
+.story-seg.cur::after{content:"";display:block;height:100%;width:60%;background:var(--gold);border-radius:3px;}
+.swipe-tip{color:var(--ink-faint);font-size:.74rem;}
+@media(hover:hover){ .swipe-tip{display:none;} }
+/* phone-native: make the card overlays full-screen on small viewports */
+@media(max-width:600px){
+  .game-overlay{padding:0;align-items:stretch;}
+  .game-shell{width:100%;max-width:100%;height:100dvh;max-height:100dvh;border-radius:0;display:flex;flex-direction:column;}
+  .game-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .game-foot{position:sticky;bottom:0;background:var(--card);padding-bottom:calc(14px + env(safe-area-inset-bottom));}
+  .game-foot .ghost,.game-foot .main{min-height:48px;}
+  .g-chip,.wm-tile,.cefr-btn{min-height:44px;}
+  .study-shell .game-body{scroll-snap-type:y proximity;}
+  .sc-photo{max-width:100%;}
+}
 .game-stats{font-size:.82rem;color:var(--ink-soft);margin-top:7px;font-weight:600;}
 #game-streak{color:var(--accent);margin-left:8px;}
 .game-body{padding:6px 22px 18px;overflow-y:auto;flex:1;}
@@ -394,7 +427,7 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
   <div class="topbar">
     <div>
       <div class="brand-sub" id="brand-sub">Satriwithaya School &middot; English Program</div>
-      <h1>Essay Marker</h1>
+      <h1>LevelUp English</h1>
       <p class="lede">Paste a prompt and a student response. Claude assesses against CEFR criteria, rewrites the essay one level higher, and catalogues every vocabulary and grammar upgrade for follow-up lessons.</p>
     </div>
     <button class="ghost" type="button" id="logout-btn" style="display:none">⎋ Logout</button>
@@ -414,7 +447,7 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
     <!-- ============ 0 · LOGIN (student console only) ============ -->
     <section class="screen" id="screen-login">
       <div class="pane" style="max-width:560px;margin:8px auto;text-align:center">
-        <h2 style="margin-bottom:8px">Welcome to the AI powered Writing Improvement Coach Console (AIWICC)</h2>
+        <h2 style="margin-bottom:8px">Welcome to LevelUp English</h2>
         <p class="lede" style="margin:0 auto 22px">Enter your Respondent's ID to retrieve your writing report and your personalised improvement coach.</p>
         <div class="field" style="text-align:left">
           <label for="login-id">Respondent's ID</label>
@@ -623,6 +656,11 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         </div>
         <div id="rp-stage" style="display:none">
           <div class="rp-scenario" id="rp-scenario"></div>
+          <div class="rp-hud">
+            <div class="rp-score-box"><span class="rp-score-lbl">SCORE</span><span id="rp-score">0</span></div>
+            <div class="rp-combo" id="rp-combo"></div>
+            <div class="rp-words" id="rp-progress"></div>
+          </div>
           <div class="rp-chips" id="rp-chips"></div>
           <div class="rp-chat" id="rp-chat"></div>
           <div class="rp-coach" id="rp-coach" style="display:none"></div>
@@ -631,9 +669,10 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
             <button class="ghost" type="button" id="rp-send">Send ↩</button>
           </div>
           <div class="file-row" style="margin-top:10px">
+            <button class="ghost" type="button" id="rp-hint">💡 Help me reply</button>
             <button class="ghost" type="button" id="rp-new">↻ New scenario</button>
-            <span class="up-hint" id="rp-progress" style="margin:0"></span>
           </div>
+          <div class="rp-suggestion" id="rp-suggestion" style="display:none"></div>
         </div>
         <div class="tool-note" id="rp-note"></div>
       </div>
@@ -663,8 +702,11 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
 </div>
 
 <div class="game-overlay hidden" id="study-overlay">
-  <div class="game-shell">
-    <div class="game-top">
+  <div class="game-shell study-shell">
+    <div class="game-meta" style="padding-top:14px">
+      <div class="story-bar" id="study-segs"></div>
+    </div>
+    <div class="game-top" style="padding-top:8px">
       <div>
         <div class="game-title" id="study-title">Study Cards</div>
         <div class="game-theme" id="study-sub"></div>
@@ -673,15 +715,15 @@ ul.blist li{margin-bottom:8px;font-size:.95rem;color:var(--ink-soft);}
         <button class="game-x" id="study-close" type="button" aria-label="Close">✕</button>
       </div>
     </div>
-    <div class="game-meta">
-      <div class="game-prog"><div class="game-prog-fill" id="study-prog"></div></div>
-      <div class="game-stats"><span id="study-step">—</span></div>
+    <div class="game-meta" style="padding-bottom:6px">
+      <div class="game-stats"><span id="study-step">—</span><span class="swipe-tip">swipe ←/→ or use the buttons</span></div>
     </div>
     <div class="game-body" id="study-body"></div>
     <div class="game-foot">
       <button class="ghost" id="study-prev" type="button">← Back</button>
       <button class="main" id="study-next" type="button" style="margin-top:0;width:auto;min-width:130px">Next →</button>
     </div>
+    <div class="story-prog" id="study-prog" style="display:none"></div>
   </div>
 </div>
 
@@ -737,6 +779,8 @@ function migrateClientData(data){
 function levelData(){ return (current && current.data.upgrades[activeLevel]) || {vocabUpgrades:[],grammarUpgrades:[],summary:'',originalAnnotated:'',upgradedAnnotated:'',targetLevel:activeLevel}; }
 function vocabRows(){ return levelData().vocabUpgrades || []; }
 function grammarRows(){ return levelData().grammarUpgrades || []; }
+function vocabRich(){ return vocabRows().filter(v => !v.synthetic); }
+function grammarRich(){ return grammarRows().filter(g => !g.synthetic); }
 function generatedLevels(){ return current ? Object.keys(current.data.upgrades).sort((a,b)=>bandIdx(a)-bandIdx(b)) : []; }
 
 /* ---------------- helpers ---------------- */
@@ -786,7 +830,7 @@ window.printScreen = function(id){
 /* ---------------- role configuration & student login ---------------- */
 function configureRole(){
   if (!IS_STUDENT) return;   // teacher console is the default markup
-  document.title = 'AIWICC — Writing Improvement Coach';
+  document.title = 'LevelUp English';
   $('tab-assess').style.display = 'none';
   $('tab-login').style.display = '';
   // Tab numbering for the student console (no Assessment tab)
@@ -803,7 +847,7 @@ function configureRole(){
   const sh2 = document.querySelector('#screen-studio h2'); if (sh2) sh2.textContent = 'Role-play Arcade';
   const intro = document.querySelector('#screen-studio > p.lede'); if (intro) intro.style.display = 'none';
   // Top-bar copy
-  const h1 = document.querySelector('.topbar h1'); if (h1) h1.textContent = 'Writing Improvement Coach';
+  const h1 = document.querySelector('.topbar h1'); if (h1) h1.textContent = 'LevelUp English';
   const lede = document.querySelector('.topbar .lede');
   if (lede) lede.textContent = 'Log in with your Respondent\u2019s ID to see your report, your upgraded writing, and to practise with your AI coach.';
   const eyebrow = $('brand-sub'); if (eyebrow) eyebrow.textContent = 'Please contact T.Chris for more information (Line ID: pegasus028)';
@@ -1089,6 +1133,17 @@ function renderUpgrades(){
   // items found in BOTH panes are highlighted, so every highlight is paired.
   const origPlain = stripMarkers(u.originalAnnotated) || current.essay || '';
   const upgPlain  = stripMarkers(u.upgradedAnnotated) || '';
+
+  // Match the real table rows first, then use a diff backstop to catch any
+  // change NOT already covered by a row — so every change ends up in a table
+  // and gets a paired highlight.
+  const baseItems = vocabRows().concat(grammarRows())
+                  .map(x => ({ id:x.id, original:x.original, replacement:x.replacement }))
+                  .filter(x => x.id && x.original && x.replacement);
+  const oM0 = collectMatches(origPlain, baseItems, 'original');
+  const uM0 = collectMatches(upgPlain,  baseItems, 'replacement');
+  ensureFullCoverage(u, origPlain, upgPlain, Object.values(oM0), Object.values(uM0));
+
   const items = vocabRows().concat(grammarRows())
                   .map(x => ({ id:x.id, original:x.original, replacement:x.replacement }))
                   .filter(x => x.id && x.original && x.replacement);
@@ -1103,7 +1158,7 @@ function renderUpgrades(){
   renderCefrRow('upg-cefr-row');
 }
 
-function stripMarkers(text){ return String(text||'').replace(/\[\[\/?(?:V|G)\d+\]\]/g, ''); }
+function stripMarkers(text){ return String(text||'').replace(/\[\[\/?(?:V|G)\d+x?\]\]/g, ''); }
 
 /* Locate each item's text in both plain texts and wrap matched spans with the
  * SAME id marker in each. Returns {original, upgraded} annotated strings. Only
@@ -1161,6 +1216,82 @@ function insertMarkers(plain, marks){
     out = out.slice(0, m.s) + '[[' + m.id + ']]' + out.slice(m.s, m.e) + '[[/' + m.id + ']]' + out.slice(m.e);
   });
   return out;
+}
+
+/* ---- completeness backstop ---- */
+// Tokenise into words with char offsets (whitespace-delimited).
+function tokenize(text){
+  const toks = []; const re = /\S+/g; let m;
+  while ((m = re.exec(String(text||''))) !== null) toks.push({ w:m[0], s:m.index, e:m.index+m[0].length });
+  return toks;
+}
+function normTok(w){ return String(w||'').toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/g,''); }
+// Word-level LCS → list of {oText,oS,oE,uText,uS,uE} change pairs (both sides non-empty).
+function wordDiff(origPlain, upgPlain){
+  const A = tokenize(origPlain), B = tokenize(upgPlain);
+  const n = A.length, mlen = B.length;
+  if (!n || !mlen) return [];
+  // LCS DP (cap to keep it cheap)
+  if (n*mlen > 400000) return [];
+  const dp = Array.from({length:n+1}, () => new Uint16Array(mlen+1));
+  for (let i=n-1;i>=0;i--) for (let j=mlen-1;j>=0;j--)
+    dp[i][j] = (normTok(A[i].w)===normTok(B[j].w) && normTok(A[i].w)) ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  const pairs = []; let i=0, j=0, oi=0, uj=0;
+  const flush = (oEnd,uEnd) => {
+    if (oi<oEnd && uj<uEnd){
+      pairs.push({ oText:origPlain.slice(A[oi].s, A[oEnd-1].e), oS:A[oi].s, oE:A[oEnd-1].e,
+                   uText:upgPlain.slice(B[uj].s, B[uEnd-1].e), uS:B[uj].s, uE:B[uEnd-1].e });
+    }
+  };
+  while (i<n && j<mlen){
+    if (normTok(A[i].w)===normTok(B[j].w) && normTok(A[i].w)){
+      flush(i, j); i++; j++; oi=i; uj=j;
+    } else if (dp[i+1][j] >= dp[i][j+1]) i++; else j++;
+  }
+  flush(n, mlen);
+  return pairs;
+}
+// Synthesize table rows only for diff changes NOT already covered (by character
+// span) by a real table row, so we never conflict with an existing row.
+function ensureFullCoverage(level, origPlain, upgPlain, oSpans, uSpans){
+  if (level._coverageDone) return;
+  level._coverageDone = true;
+  const vocab = level.vocabUpgrades || (level.vocabUpgrades = []);
+  const grammar = level.grammarUpgrades || (level.grammarUpgrades = []);
+  const overlaps = (s,e,spans) => spans.some(sp => s < sp.e && e > sp.s);
+  const claimedO = oSpans.slice(), claimedU = uSpans.slice();
+  let vN = vocab.length + 1, gN = grammar.length + 1;
+
+  wordDiff(origPlain, upgPlain).forEach(ch => {
+    if (overlaps(ch.oS, ch.oE, claimedO) || overlaps(ch.uS, ch.uE, claimedU)) return;  // already covered
+    const t = trimEdgesJS(ch.oText.trim(), ch.uText.trim());
+    const o = t.original, r = t.replacement;
+    if (!o || !r || o.toLowerCase() === r.toLowerCase()) return;
+    claimedO.push({ s:ch.oS, e:ch.oE }); claimedU.push({ s:ch.uS, e:ch.uE });
+    const ow = o.split(/\s+/).length, rw = r.split(/\s+/).length;
+    if (ow <= 3 && rw <= 4){
+      vocab.push({ id:'V'+(vN++)+'x', synthetic:true, marked:true,
+        original:o, originalLevel:'', replacement:r, replacementLevel:activeLevel,
+        definition:'An upgraded way to express “'+o+'”.', partOfSpeech:'',
+        synonyms:[], antonyms:[], examples:[], collocations:[], imageDescription:'' });
+    } else {
+      grammar.push({ id:'G'+(gN++)+'x', synthetic:true, marked:true,
+        original:o, originalLevel:'', replacement:r, replacementLevel:activeLevel,
+        topic:'Phrasing upgrade', subTopic:'', steps:[] });
+    }
+  });
+}
+// Trim words shared at the start/end of an original→replacement pair (client side).
+function trimEdgesJS(o, r){
+  if (!o || !r) return { original:o, replacement:r };
+  const ow = o.split(/\s+/), rw = r.split(/\s+/);
+  const nz = w => w.toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/g,'');
+  let st = 0;
+  while (st < ow.length-1 && st < rw.length-1 && nz(ow[st]) && nz(ow[st]) === nz(rw[st])) st++;
+  let oe = ow.length, re = rw.length;
+  while (oe-1 > st && re-1 > st && nz(ow[oe-1]) && nz(ow[oe-1]) === nz(rw[re-1])){ oe--; re--; }
+  const no = ow.slice(st, oe).join(' '), nr = rw.slice(st, re).join(' ');
+  return (no && nr) ? { original:no, replacement:nr } : { original:o, replacement:r };
 }
 
 /* Shared CEFR button row used on Upgrades, Vocabulary and Grammar tabs.
@@ -1225,7 +1356,7 @@ async function triggerUpgrade(level){
 function annotatedToHtml(text){
   text = String(text||'');
   let html = '', last = 0;
-  const re = /\[\[(V|G)(\d+)\]\]([\s\S]*?)\[\[\/\1\2\]\]/g;
+  const re = /\[\[(V|G)(\d+x?)\]\]([\s\S]*?)\[\[\/\1\2\]\]/g;
   let mt;
   while ((mt = re.exec(text)) !== null){
     html += esc(text.slice(last, mt.index));
@@ -1235,7 +1366,7 @@ function annotatedToHtml(text){
     last = re.lastIndex;
   }
   html += esc(text.slice(last));
-  return html.replace(/\[\[\/?(?:V|G)\d+\]\]/g, '');   // any stray unpaired markers
+  return html.replace(/\[\[\/?(?:V|G)\d+x?\]\]/g, '');   // any stray unpaired markers
 }
 function bindSegEvents(pane, otherPane){
   pane.querySelectorAll('.seg').forEach(seg => {
@@ -1363,7 +1494,7 @@ async function exportTable(kind){
 }
 async function genBlooket(kind){
   if (!current) return;
-  const items = tableData(kind);
+  const items = (kind==='vocab' ? vocabRich() : grammarRich());
   if (!items.length) return toolNote(kind, 'err', 'There are no upgrade items to build questions from.');
   const btn = $(kind+'-blooket-btn');
   btn.disabled = true;
@@ -1388,7 +1519,7 @@ async function genBlooket(kind){
 }
 
 /* -------- 6 · lesson studio -------- */
-const rp = { scenario:null, scenarioText:'', history:[], used:{}, busy:false };
+const rp = { scenario:null, scenarioText:'', history:[], used:{}, busy:false, score:0, combo:0 };
 
 function studioPayload(){
   const m = current.meta || {};
@@ -1397,8 +1528,8 @@ function studioPayload(){
     targetLevel: activeLevel,
     promptText: m.prompt || '',
     essayGist: (current.essay || '').slice(0, 1200),
-    vocab: vocabRows(),
-    grammar: grammarRows()
+    vocab: vocabRich(),
+    grammar: grammarRich()
   };
 }
 function resetStudio(){
@@ -1408,7 +1539,8 @@ function resetStudio(){
   if ($('plan-note')) $('plan-note').className = 'tool-note';
   ['slides','podcast','song','video'].forEach(k => { const n = $('mat-'+k+'-note'); if (n) n.className = 'tool-note'; });
   $('rp-note').className = 'tool-note';
-  rp.scenario = null; rp.scenarioText = ''; rp.history = []; rp.used = {}; rp.busy = false;
+  rp.scenario = null; rp.scenarioText = ''; rp.history = []; rp.used = {}; rp.busy = false; rp.score = 0; rp.combo = 0;
+  if ($('rp-suggestion')) $('rp-suggestion').style.display = 'none';
   $('rp-stage').style.display = 'none';
   $('rp-setup').style.display = '';
   $('rp-chat').innerHTML = '';
@@ -1479,9 +1611,34 @@ document.querySelectorAll('[data-mat]').forEach(btn => {
 $('rp-start').addEventListener('click', startRoleplay);
 $('rp-new').addEventListener('click', startRoleplay);
 $('rp-send').addEventListener('click', sendRoleplay);
+$('rp-hint').addEventListener('click', roleplayHint);
 $('rp-input').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendRoleplay(); }
 });
+async function roleplayHint(){
+  if (rp.busy || !rp.scenario) return;
+  rp.busy = true;
+  const btn = $('rp-hint'); const old = btn.textContent; btn.disabled = true; btn.textContent = '💡 Thinking…';
+  try {
+    const out = await api(Object.assign({
+      action:'roleplay', hint:true, scenario: rp.scenarioText, history: rp.history
+    }, studioPayload()));
+    const box = $('rp-suggestion');
+    if (out.suggestion){
+      box.style.display = '';
+      box.innerHTML = '💡 <b>You could say:</b> “' + esc(out.suggestion) + '”' +
+        (out.usesTarget ? ' <span style="color:var(--gold)">(uses “'+esc(out.usesTarget)+'” ⭐)</span>' : '') +
+        '<br><span class="rs-use">Use this reply →</span>';
+      box.querySelector('.rs-use').addEventListener('click', () => {
+        $('rp-input').value = out.suggestion; box.style.display = 'none'; $('rp-input').focus();
+      });
+    }
+  } catch(err){
+    const n = $('rp-note'); n.className = 'tool-note err'; n.textContent = 'Hint failed: ' + err.message;
+  }
+  btn.disabled = false; btn.textContent = old;
+  rp.busy = false;
+}
 async function startRoleplay(){
   if (rp.busy) return;
   rp.busy = true;
@@ -1493,7 +1650,10 @@ async function startRoleplay(){
     rp.scenario = out.scenario || {};
     rp.scenarioText = 'SCENARIO: ' + JSON.stringify(rp.scenario);
     rp.history = [{ role:'assistant', content: out.reply }];
-    rp.used = {};
+    rp.used = {}; rp.score = 0; rp.combo = 0;
+    $('rp-score').textContent = '0';
+    $('rp-combo').classList.remove('show');
+    $('rp-suggestion').style.display = 'none';
     $('rp-setup').style.display = 'none';
     $('rp-stage').style.display = '';
     const sc = rp.scenario;
@@ -1519,6 +1679,7 @@ async function sendRoleplay(){
   if (!text) return;
   rp.busy = true;
   box.value = '';
+  $('rp-suggestion').style.display = 'none';
   addMsg('me', text, 'Student');
   rp.history.push({ role:'user', content:text });
   markUsedTargets(text);
@@ -1553,7 +1714,7 @@ function addMsg(side, text, who){
   return div;
 }
 function renderChips(){
-  const chips = vocabRows().map(v =>
+  const chips = vocabRich().map(v =>
     '<span class="rp-chip'+(rp.used[v.id]?' used':'')+'" id="chip-'+esc(v.id)+'">'+esc(v.replacement)+'</span>'
   ).join('');
   $('rp-chips').innerHTML = chips;
@@ -1561,7 +1722,8 @@ function renderChips(){
 }
 function markUsedTargets(text){
   const low = ' ' + text.toLowerCase() + ' ';
-  vocabRows().forEach(v => {
+  let newHits = 0;
+  vocabRich().forEach(v => {
     if (rp.used[v.id]) return;
     const phrase = String(v.replacement||'').toLowerCase().trim();
     if (!phrase) return;
@@ -1575,16 +1737,36 @@ function markUsedTargets(text){
     }
     if (hit){
       rp.used[v.id] = true;
+      newHits++;
       const chip = $('chip-'+v.id);
-      if (chip) chip.classList.add('used');
+      if (chip){ chip.classList.add('used'); chip.classList.remove('flash'); void chip.offsetWidth; chip.classList.add('flash'); }
     }
   });
+  if (newHits > 0){
+    rp.combo += 1;
+    const gained = newHits * 100 * rp.combo;   // combo multiplies the more turns in a row you score
+    rp.score += gained;
+    const sc = $('rp-score'); sc.textContent = rp.score;
+    sc.classList.remove('bump'); void sc.offsetWidth; sc.classList.add('bump');
+    const cb = $('rp-combo');
+    if (rp.combo >= 2){ cb.textContent = '🔥 COMBO x' + rp.combo; cb.classList.add('show'); }
+    comboPop('+' + gained + (rp.combo>=2 ? '  🔥x'+rp.combo : ''));
+  } else {
+    rp.combo = 0;                              // a turn with no new target word breaks the combo
+    $('rp-combo').classList.remove('show');
+  }
   updateRpProgress();
 }
+function comboPop(text){
+  const el = document.createElement('div');
+  el.className = 'combo-pop'; el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
 function updateRpProgress(){
-  const total = vocabRows().length;
+  const total = vocabRich().length;
   const used = Object.keys(rp.used).length;
-  $('rp-progress').textContent = total ? ('Target words used: ' + used + ' / ' + total + (used===total && total>0 ? ' — full house! 🎉' : '')) : '';
+  $('rp-progress').textContent = total ? ('⭐ ' + used + ' / ' + total + ' words' + (used===total && total>0 ? ' — full house! 🎉' : '')) : '';
 }
 
 /* =================================================================
@@ -1606,7 +1788,7 @@ function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math
 async function launchGame(kind){
   if (!current) return;
   const note = $(kind+'-note');
-  const items = kind==='vocab' ? vocabRows() : grammarRows();
+  const items = kind==='vocab' ? vocabRich() : grammarRich();
   if (!items.length){ note.className='tool-note err'; note.textContent='No items to build a game from.'; return; }
   note.className='tool-note';
   try {
@@ -2042,7 +2224,7 @@ function speak(text){
 
 async function openStudy(kind){
   if (!current) return;
-  const items = kind==='vocab' ? vocabRows() : grammarRows();
+  const items = kind==='vocab' ? vocabRich() : grammarRich();
   const note = $(kind+'-note');
   if (!items.length){ note.className='tool-note err'; note.textContent='No items to study at this level.'; return; }
   note.className='tool-note';
@@ -2071,6 +2253,35 @@ async function openStudy(kind){
 
 function stripLvl(s){ return String(s||'').replace(/\s*\([ABC][12]\)\s*$/,'').trim(); }
 function lvlOf(s){ return (String(s||'').match(/\(([ABC][12])\)/)||[])[1]||''; }
+function renderStorySegs(idx, n){
+  const bar = $('study-segs');
+  if (!bar) return;
+  if (n > 24){ bar.innerHTML = ''; return; }     // too many for segments; the counter covers it
+  let h = '';
+  for (let i=0;i<n;i++){
+    const cls = i < idx ? 'done' : (i === idx ? 'cur' : '');
+    h += '<div class="story-seg '+cls+'"></div>';
+  }
+  bar.innerHTML = h;
+}
+
+// TikTok/Stories-style horizontal swipe between cards.
+(function(){
+  const body = $('study-body');
+  if (!body) return;
+  let x0 = null, y0 = null;
+  body.addEventListener('touchstart', e => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, {passive:true});
+  body.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy)*1.4) return;   // mostly-horizontal only
+    if (S.lookup){ if (dx > 0){ S.lookup = null; renderCard(); } return; }
+    if (dx < 0 && S.idx < S.cards.length-1){ S.idx++; renderCard(); }
+    else if (dx > 0 && S.idx > 0){ S.idx--; renderCard(); }
+  }, {passive:true});
+})();
 
 /* Wrap the first occurrence of the keyword (or its head word) in a sentence. */
 function highlightKeyword(sentence, keyword){
@@ -2112,7 +2323,7 @@ function renderCard(){
   const inLookup = !!S.lookup;
   const n = S.cards.length;
   $('study-step').textContent = inLookup ? ('Looking up “'+esc(S.lookup.item.replacement)+'”') : ('Card ' + (S.idx+1) + ' / ' + n);
-  $('study-prog').style.width = inLookup ? '100%' : (Math.round((S.idx+1)/n*100) + '%');
+  renderStorySegs(inLookup ? -1 : S.idx, n);
   $('study-prev').disabled = inLookup || S.idx===0;
   $('study-prev').style.visibility = inLookup ? 'hidden' : '';
   $('study-next').textContent = inLookup ? '↩ Back to the deck' : (S.idx < n-1 ? 'Next →' : 'Finish');
